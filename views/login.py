@@ -145,7 +145,7 @@ def show_login_page():
                 if success:
                     notification("Konto zostało utworzone! Możesz się zalogować.", type="success")
                     # Przełącz na zakładkę logowania
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.error("Nazwa użytkownika jest już zajęta.")
         
