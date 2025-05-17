@@ -15,7 +15,7 @@ from views.degen_test import plot_radar_chart
 from utils.components import (
     zen_header, mission_card, degen_card, progress_bar, stat_card, 
     xp_level_display, zen_button, notification, leaderboard_item, 
-    add_animations_css, data_chart, user_stats_panel, lesson_card
+    add_animations_css, data_chart, user_stats_panel
 )
 
 def calculate_xp_progress(user_data):
@@ -114,30 +114,38 @@ def display_lesson_cards(lessons_list, tab_name=""):
         # Get lesson properties
         difficulty = lesson.get('difficulty', 'intermediate')
         is_completed = lesson_id in user_data.get('completed_lessons', [])
-          # Przygotuj symbol trudności
+        
+        # Estimate reading time: average adult reads ~250 words per minute
+        # We'll approximate based on content length (simplified)
+        content_length = len(lesson.get('description', '')) + sum(len(section.get('content', '')) 
+                                                                for section in lesson.get('sections', {}).get('learning', {}).get('sections', []))
+        estimated_minutes = max(1, round(content_length / 1000))  # Rough estimate
+        
+        # Przygotuj symbol trudności
         if difficulty == "beginner":
             difficulty_symbol = "🟢"
         elif difficulty == "intermediate":
             difficulty_symbol = "🟠"
         else:
             difficulty_symbol = "🔴"
-          # Użyj komponentu lesson_card dla spójności z widokiem lekcji
-        lesson_card(
-            title=lesson.get('title', 'Lekcja'),
-            description=lesson.get('description', 'Ta lekcja wprowadza podstawowe zasady...'),
-            xp=lesson.get('xp_reward', 30),
-            difficulty=difficulty,
-            category=lesson.get('tag', ''),
-            completed=is_completed,
-            button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
-            button_key=f"{tab_name}_start_{lesson_id}_{i}",
-            lesson_id=lesson_id,
-            on_click=lambda lesson_id=lesson_id: (
-                setattr(st.session_state, 'current_lesson', lesson_id),
-                setattr(st.session_state, 'page', 'lesson'),
-                st.rerun()
-            )
+        
+        degen_card(
+            title=lesson['title'],
+            description=lesson['description'][:100] + ('...' if len(lesson['description']) > 100 else ''),
+            badges=[
+                {'text': f'💎 {lesson["xp_reward"]} XP', 'type': 'xp'},
+                {'text': f'{difficulty_symbol} {difficulty.capitalize()}', 'type': f'difficulty-{difficulty.lower()}'},
+                {'text': f'⏱️ {estimated_minutes} min', 'type': 'time'},
+                {'text': f'{lesson["tag"]}', 'type': 'tag'}
+            ],
+            status='completed' if is_completed else 'incomplete',
+            status_text='✓ Ukończono' if is_completed else '○ Nieukończono'
         )
+        unique_key = f"{tab_name}_start_{lesson_id}_{i}"
+        if zen_button(f"Rozpocznij", key=unique_key):
+            st.session_state.current_lesson = lesson_id
+            st.session_state.page = 'lesson'
+            st.rerun()
 
 def get_recommended_lessons(username):
     """Get recommended lessons based on user type"""

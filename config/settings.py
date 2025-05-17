@@ -177,5 +177,41 @@ BADGES = {
     "social": {"name": "Społecznik", "icon": "🤝", "description": "Podziel się swoim wynikiem testu"},
     "zen_master": {"name": "Mistrz Zen", "icon": "🧘‍♂️", "description": "Ukończ wszystkie lekcje z kategorii Mindfulness"},
     "market_pro": {"name": "Analityk Rynku", "icon": "📊", "description": "Ukończ wszystkie lekcje z kategorii Analiza Rynku"},
-    "strategy_guru": {"name": "Guru Strategii", "icon": "🎯", "description": "Stwórz i zapisz własną strategię inwestycyjną"}
+    "strategy_guru": {"name": "Guru Strategii", "icon": "🎯", "description": "Stwórz i zapisz własną strategię inwestycyjną"},
+    
+    # Nowe odznaki związane z aktywnością
+    "streak_master": {"name": "Mistrz Serii", "icon": "🔥", "description": "Utrzymaj 10-dniową serię logowania"},
+    "daily_hero": {"name": "Bohater Dnia", "icon": "⭐", "description": "Ukończ wszystkie misje dzienne w jeden dzień"},
+    "weekend_warrior": {"name": "Wojownik Weekendu", "icon": "🏆", "description": "Ucz się regularnie przez 4 weekendy z rzędu"},
+    
+    # Odznaki związane z postępem nauki
+    "knowledge_addict": {"name": "Głodny Wiedzy", "icon": "🤓", "description": "Spędź łącznie 10 godzin na nauce w aplikacji"},
+    "quick_learner": {"name": "Szybki Uczeń", "icon": "⚡", "description": "Ukończ 3 lekcje w jeden dzień"},
+    "night_owl": {"name": "Nocna Sowa", "icon": "🦉", "description": "Ukończ lekcję po godzinie 22:00"},
+    "early_bird": {"name": "Ranny Ptaszek", "icon": "🐦", "description": "Ukończ lekcję przed godziną 8:00"},
+    
+    # Odznaki społecznościowe
+    "mentor": {"name": "Mentor", "icon": "👨‍🏫", "description": "Pomóż innemu użytkownikowi ukończyć trudną lekcję"},
+    "networker": {"name": "Networker", "icon": "🌐", "description": "Dołącz do 3 grup dyskusyjnych w aplikacji"},
+    "influencer": {"name": "Influencer", "icon": "🎭", "description": "Uzyskaj 10 polubień dla swojego postu w społeczności"},
+    
+    # Odznaki za osiągnięcia
+    "first_achievement": {"name": "Początek Drogi", "icon": "🏁", "description": "Zdobądź pierwsze osiągnięcie"},
+    "collector": {"name": "Kolekcjoner", "icon": "🧩", "description": "Odblokuj 10 różnych odznak"},
+    "perfectionist": {"name": "Perfekcjonista", "icon": "💯", "description": "Uzyskaj 100% w quizie z dowolnej lekcji"},
+    
+    # Odznaki degen typeów
+    "degen_master": {"name": "Mistrz Degenów", "icon": "👑", "description": "Poznaj wszystkie typy degenów w eksploratorze"},
+    "self_aware": {"name": "Samoświadomy", "icon": "🔮", "description": "Wykonaj ponownie test typu i potwierdź swój profil"},
+    "identity_shift": {"name": "Przemiana", "icon": "🦋", "description": "Zmień swój główny typ degena poprzez rozwój nowych umiejętności"},
+    
+    # Odznaki ekonomiczne
+    "saver": {"name": "Oszczędny", "icon": "💰", "description": "Zgromadź 1000 DegenCoins"},
+    "big_spender": {"name": "Rozrzutny", "icon": "💸", "description": "Wydaj 2000 DegenCoins w sklepie"},
+    "collector_premium": {"name": "Kolekcjoner Premium", "icon": "✨", "description": "Odblokuj wszystkie awatary dostępne w sklepie"},
+    
+    # Odznaki wyzwań
+    "challenge_accepted": {"name": "Wyzwanie Przyjęte", "icon": "🎯", "description": "Ukończ pierwsze wyzwanie tygodniowe"},
+    "challenge_master": {"name": "Mistrz Wyzwań", "icon": "🏅", "description": "Ukończ 5 wyzwań tygodniowych"},
+    "seasonal_champion": {"name": "Mistrz Sezonu", "icon": "🏆", "description": "Ukończ wszystkie wyzwania sezonowe"}
 }

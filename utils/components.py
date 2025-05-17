@@ -247,23 +247,40 @@ def zen_header(title, subtitle=None):
     if subtitle:
         st.markdown(f"<p class='zen-subtitle'>{subtitle}</p>", unsafe_allow_html=True)
 
-def navigation_menu(items, current_page=None):
-    """
-    Tworzy menu nawigacyjne.
+def navigation_menu():
+    """Wyświetla menu nawigacyjne aplikacji"""
     
-    Parametry:
-    - items: Lista słowników z kluczami 'name', 'page', 'icon'
-    - current_page: Obecnie aktywna strona
-    """
-    for item in items:
-        icon = item.get('icon', '')
-        label = f"{icon} {item['name']}"
-        disabled = current_page == item['page']
+    menu_options = [
+        {"id": "dashboard", "name": "Dashboard", "icon": "🏠"},
+        {"id": "degen_test", "name": "Test degena", "icon": "🧪"},
+        {"id": "lesson", "name": "Lekcje", "icon": "📚"},
+        {"id": "skills", "name": "Umiejętności", "icon": "🌳"},  # Dodaj tę linię
+        {"id": "degen_explorer", "name": "Eksplorator", "icon": "🔍"},
+        {"id": "profile", "name": "Profil", "icon": "👤"}
+    ]
+    
+    for option in menu_options:
+        # Dodaj stylizację dla aktywnego przycisku bez parametru active
+        button_label = f"{option['icon']} {option['name']}"
         
-        if zen_button(label, key=f"nav_{item['page']}", 
-                    disabled=disabled, use_container_width=True):
-            st.session_state.page = item['page']
+        # Użyj zen_button bez parametru active
+        if zen_button(
+            button_label, 
+            key=f"nav_{option['id']}"
+        ):
+            st.session_state.page = option['id']
             st.rerun()
+        
+        # Opcjonalnie, możesz dodać stylizację dla aktywnego przycisku używając CSS
+        if st.session_state.page == option['id']:
+            st.markdown(f"""
+            <style>
+            div[data-testid="stButton"] button[kind="secondary"][data-testid="baseButton-secondary"][aria-label="{button_label}"] {{
+                background-color: rgba(255, 255, 255, 0.1);
+                border-left: 3px solid #4CAF50;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
 
 # Komponenty statystyk i danych
 
@@ -654,3 +671,129 @@ def user_stats_panel(username, avatar, degen_type, level, xp, completed_lessons=
     # Pasek postępu XP do następnego poziomu
     if next_level_xp is not None:
         xp_level_display(xp=xp, level=level, next_level_xp=next_level_xp)
+
+def lesson_card(title, description, image=None, xp=0, duration=0, difficulty=None, 
+               completed=False, button_text="Rozpocznij", on_click=None, 
+               button_key=None, lesson_id=None, category=None):
+    """
+    Renders a standardized lesson card for both dashboard and lessons view
+    """
+    # Prepare difficulty info
+    if difficulty is None:
+        difficulty = "beginner"
+    
+    difficulty_colors = {
+        "beginner": "#4CAF50",
+        "intermediate": "#FF9800",
+        "advanced": "#F44336",
+        "expert": "#9C27B0"
+    }
+    
+    difficulty_icons = {
+        "beginner": "🟢",
+        "intermediate": "🟠",
+        "advanced": "🔴",
+        "expert": "⭐"
+    }
+    
+    difficulty_color = difficulty_colors.get(difficulty.lower(), "#4CAF50")
+    difficulty_icon = difficulty_icons.get(difficulty.lower(), "🟢")
+      # Generate the HTML for the card with properly formatted CSS
+    card_html = f"""
+    <div class="lesson-card">
+        <h3>{title}</h3>
+        <div class="lesson-badges">
+            <span class="xp-badge">
+                💎 {xp} XP
+            </span>
+            <span class="difficulty-badge" style="background-color: {difficulty_color};">
+                {difficulty_icon} {difficulty.capitalize()}
+            </span>
+            {f'<span class="category-badge">{category}</span>' if category else ''}
+        </div>
+        <p>{description[:150]}{'...' if len(description) > 150 else ''}</p>
+        <p class="completion-status {'completed' if completed else ''}">
+            {'✓ Ukończono' if completed else '○ Nieukończono'}
+        </p>
+    </div>
+    """
+    
+    # Define CSS styles separately
+    styles = """
+    <style>
+    .lesson-card {
+        background-color: white;
+        color: #333;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 5px solid #2196F3;
+    }
+    .lesson-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 10px 0;
+    }
+    .xp-badge {
+        background-color: #FFD700;
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .difficulty-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: white;
+    }
+    .time-badge {
+        background-color: #2196F3;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+    .category-badge {
+        background-color: #9575CD;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: inline-block;
+        margin-top: 5px;
+    }
+    .completion-status {
+        color: #757575;
+        margin-top: 10px;
+    }
+    .completion-status.completed {
+        color: #4CAF50;
+    }
+    </style>
+    """
+    
+    # Render the card with styles
+    st.markdown(card_html + styles, unsafe_allow_html=True)
+    
+    # Add the button with custom behavior
+    if button_key is None and lesson_id is not None:
+        button_key = f"lesson_btn_{lesson_id}"
+    
+    if zen_button(button_text, key=button_key, use_container_width=True):
+        if on_click and callable(on_click):
+            # If there's a callback function, call it with lesson_id
+            if lesson_id:
+                on_click(lesson_id)
+            else:
+                on_click()
+        else:
+            # Default behavior - set current lesson and redirect
+            st.session_state.current_lesson = lesson_id
+            st.session_state.lesson_step = 'intro'
+            if 'quiz_score' in st.session_state:
+                st.session_state.quiz_score = 0
+            st.rerun()

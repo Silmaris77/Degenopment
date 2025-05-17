@@ -289,3 +289,65 @@ def show_profile():
         
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
+
+def show_badges_section():
+    """Wyświetla odznaki użytkownika"""
+    st.header("Twoje odznaki")
+    
+    # Pobierz dane użytkownika
+    users_data = load_user_data()
+    user_data = users_data.get(st.session_state.username, {})
+    user_badges = user_data.get("badges", [])
+    
+    if not user_badges:
+        st.info("Jeszcze nie masz żadnych odznak. Rozpocznij naukę i wykonuj zadania, aby je zdobyć!")
+        return
+    
+    # Pogrupuj odznaki według kategorii
+    badge_categories = {
+        "Podstawowe": ["starter", "tester", "learner", "consistent"],
+        "Aktywność": ["streak_master", "daily_hero", "weekend_warrior"],
+        "Nauka": ["knowledge_addict", "quick_learner", "night_owl", "early_bird", "zen_master", 
+                  "market_pro", "strategy_guru"],
+        "Społeczność": ["social", "mentor", "networker", "influencer"],
+        "Specjalne": ["first_achievement", "collector", "perfectionist", "degen_master", 
+                      "self_aware", "identity_shift"],
+        "Ekonomia": ["saver", "big_spender", "collector_premium"],
+        "Wyzwania": ["challenge_accepted", "challenge_master", "seasonal_champion"]
+    }
+    
+    # Pokaż odznaki w kategoriach
+    tabs = st.tabs(list(badge_categories.keys()))
+    
+    for i, (category, badge_ids) in enumerate(badge_categories.items()):
+        with tabs[i]:
+            cols = st.columns(3)
+            badges_displayed = 0
+            
+            # Najpierw pokaż odblokowane odznaki
+            for badge_id in badge_ids:
+                if badge_id in user_badges:
+                    badge_info = BADGES[badge_id]
+                    with cols[badges_displayed % 3]:
+                        st.markdown(f"""
+                        <div class="badge-container unlocked">
+                            <div class="badge-icon">{badge_info['icon']}</div>
+                            <div class="badge-name">{badge_info['name']}</div>
+                            <div class="badge-description">{badge_info['description']}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    badges_displayed += 1
+            
+            # Potem pokaż zablokowane odznaki
+            for badge_id in badge_ids:
+                if badge_id not in user_badges:
+                    badge_info = BADGES[badge_id]
+                    with cols[badges_displayed % 3]:
+                        st.markdown(f"""
+                        <div class="badge-container locked">
+                            <div class="badge-icon">🔒</div>
+                            <div class="badge-name">{badge_info['name']}</div>
+                            <div class="badge-description">{badge_info['description']}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    badges_displayed += 1

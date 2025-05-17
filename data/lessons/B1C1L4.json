@@ -1,9 +1,10 @@
 {
-  "xp_reward": 50,
+  "id": "B1C1L4",
+  "xp_reward": 20,
   "tag": "Psychologia inwestowania",
   "description": "Ta lekcja wprowadza podstawy teorii perspektywy, efektu dyspozycji oraz zarządzania emocjami w inwestowaniu.",
-  "title": "SSStrach przed stratą",
-  "difficulty": "advanced",
+  "title": "Zmienność",
+  "difficulty": "beginner",
   "intro": "<p>Witaj w lekcji o strachu przed stratą w kontekście inwestowania!</p>",
   "sections": {
     "learning": {

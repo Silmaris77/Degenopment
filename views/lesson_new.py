@@ -59,11 +59,18 @@ def show_lesson():
             for i, (lesson_id, lesson) in enumerate(category_lessons):
                 # Sprawdź, czy lekcja jest ukończona
                 is_completed = lesson_id in completed_lessons
-                  # Użyj komponentu lesson_card zamiast ręcznego HTML
+                
+                # Szacowanie czasu na podstawie długości treści
+                content_length = len(lesson.get('description', '')) + sum(len(section.get('content', '')) 
+                                                        for section in lesson.get('sections', {}).get('learning', {}).get('sections', []))
+                estimated_minutes = max(1, round(content_length / 1000))
+                
+                # Użyj komponentu lesson_card zamiast ręcznego HTML
                 lesson_card(
                     title=lesson.get('title', 'Lekcja'),
                     description=lesson.get('description', 'Ta lekcja wprowadza podstawowe zasady...'),
                     xp=lesson.get('xp_reward', 30),
+                    duration=estimated_minutes,
                     difficulty=lesson.get('difficulty', 'beginner'),
                     category=lesson.get('tag', category),
                     completed=is_completed,
