@@ -1,7 +1,10 @@
 import streamlit as st
+from PIL import Image
 from data.test_questions import DEGEN_TYPES
 from data.degen_details import degen_details
 from utils.components import zen_header, content_section, quote_block, tip_block, notification, zen_button
+from utils.material3_components import apply_material3_theme
+from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view
 import re
 
 # Poprawka dla funkcji clean_html, aby była bardziej skuteczna
@@ -17,7 +20,16 @@ def show_degen_explorer():
     """
     Wyświetla stronę umożliwiającą eksplorację wszystkich typów degenów 
     wraz z ich szczegółowymi opisami.
-    """
+    """    # Zastosuj style Material 3
+    apply_material3_theme()
+    
+    # Opcja wyboru urządzenia w trybie deweloperskim
+    if st.session_state.get('dev_mode', False):
+        toggle_device_view()
+    
+    # Pobierz aktualny typ urządzenia
+    device_type = get_device_type()
+    
     zen_header("Odkrywanie Typów Degenów")
     
     # Wprowadzenie do typów degenów

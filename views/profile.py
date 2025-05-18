@@ -1,7 +1,25 @@
 import streamlit as st
-from datetime import datetime, timedelta
+import pandas as pd
+import random
+import re
+import os
 import numpy as np
+import json
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle, RegularPolygon
+from matplotlib.path import Path
+from matplotlib.projections.polar import PolarAxes
+from matplotlib.projections import register_projection
+from matplotlib.spines import Spine
+from matplotlib.transforms import Affine2D
+from data.test_questions import DEGEN_TYPES
+from data.users import load_user_data, save_user_data, update_single_user_field
+from PIL import Image
+from utils.components import zen_header, zen_button, notification, content_section, tip_block
+from utils.material3_components import apply_material3_theme
+from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view, apply_responsive_styles, get_responsive_figure_size
+
+from datetime import datetime, timedelta
 import time
 from utils.personalization import (
     update_user_avatar,
@@ -17,15 +35,26 @@ from utils.goals import (
     calculate_goal_metrics
 )
 from config.settings import USER_AVATARS, THEMES, DEGEN_TYPES, BADGES
-from data.users import load_user_data
 from data.degen_details import degen_details
 from views.degen_test import plot_radar_chart
 from views.dashboard import calculate_xp_progress
 from utils.components import zen_header, zen_button, notification, content_section, stat_card, xp_level_display, goal_card, badge_card, progress_bar, tip_block, quote_block, add_animations_css
 from utils.user_components import user_stats_panel
-from utils.user_components import user_stats_panel
 
 def show_profile():
+    # Zastosuj style Material 3
+    apply_material3_theme()
+    
+    # Zastosuj responsywne style
+    apply_responsive_styles()
+    
+    # Opcja wyboru urządzenia w trybie deweloperskim
+    if st.session_state.get('dev_mode', False):
+        toggle_device_view()
+    
+    # Pobierz aktualny typ urządzenia
+    device_type = get_device_type()
+    
     zen_header("Profil użytkownika")
     
     # Wczytaj dane użytkownika
@@ -39,7 +68,7 @@ def show_profile():
     # Add animations and effects using the component
     add_animations_css()
     
-    # User Statistics Section
+    # User Statistics Section - z wykorzystaniem nowych komponentów Material 3
     st.markdown("<div class='st-bx fadeIn'>", unsafe_allow_html=True)
     
     # Setup data for user stats panel
@@ -232,12 +261,29 @@ def show_profile():
                     border_color="#3498db",
                     collapsed=False
                 )
-                
-                # Radar chart if available
+                  # Radar chart if available
                 if 'test_scores' in user_data:
                     st.subheader("Twój profil inwestycyjny")
-                    radar_fig = plot_radar_chart(user_data['test_scores'])
+                    
+                    # Ensure the radar chart is responsive by passing device_type
+                    radar_fig = plot_radar_chart(user_data['test_scores'], device_type=device_type)
+                    
+                    # Add mobile-specific styles for the chart container
+                    if device_type == 'mobile':
+                        st.markdown("""
+                        <style>
+                        .radar-chart-container {
+                            margin: 0 -20px; /* Negative margin to use full width on mobile */
+                            padding-bottom: 15px;
+                        }
+                        </style>
+                        <div class="radar-chart-container">
+                        """, unsafe_allow_html=True)
+                        
                     st.pyplot(radar_fig)
+                    
+                    if device_type == 'mobile':
+                        st.markdown("</div>", unsafe_allow_html=True)
                 
                 # Strengths and challenges in two columns
                 col1, col2 = st.columns(2)
@@ -289,3 +335,65 @@ def show_profile():
         
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
+
+def show_badges_section():
+    """Wyświetla odznaki użytkownika"""
+    st.header("Twoje odznaki")
+    
+    # Pobierz dane użytkownika
+    users_data = load_user_data()
+    user_data = users_data.get(st.session_state.username, {})
+    user_badges = user_data.get("badges", [])
+    
+    if not user_badges:
+        st.info("Jeszcze nie masz żadnych odznak. Rozpocznij naukę i wykonuj zadania, aby je zdobyć!")
+        return
+    
+    # Pogrupuj odznaki według kategorii
+    badge_categories = {
+        "Podstawowe": ["starter", "tester", "learner", "consistent"],
+        "Aktywność": ["streak_master", "daily_hero", "weekend_warrior"],
+        "Nauka": ["knowledge_addict", "quick_learner", "night_owl", "early_bird", "zen_master", 
+                  "market_pro", "strategy_guru"],
+        "Społeczność": ["social", "mentor", "networker", "influencer"],
+        "Specjalne": ["first_achievement", "collector", "perfectionist", "degen_master", 
+                      "self_aware", "identity_shift"],
+        "Ekonomia": ["saver", "big_spender", "collector_premium"],
+        "Wyzwania": ["challenge_accepted", "challenge_master", "seasonal_champion"]
+    }
+    
+    # Pokaż odznaki w kategoriach
+    tabs = st.tabs(list(badge_categories.keys()))
+    
+    for i, (category, badge_ids) in enumerate(badge_categories.items()):
+        with tabs[i]:
+            cols = st.columns(3)
+            badges_displayed = 0
+            
+            # Najpierw pokaż odblokowane odznaki
+            for badge_id in badge_ids:
+                if badge_id in user_badges:
+                    badge_info = BADGES[badge_id]
+                    with cols[badges_displayed % 3]:
+                        st.markdown(f"""
+                        <div class="badge-container unlocked">
+                            <div class="badge-icon">{badge_info['icon']}</div>
+                            <div class="badge-name">{badge_info['name']}</div>
+                            <div class="badge-description">{badge_info['description']}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    badges_displayed += 1
+            
+            # Potem pokaż zablokowane odznaki
+            for badge_id in badge_ids:
+                if badge_id not in user_badges:
+                    badge_info = BADGES[badge_id]
+                    with cols[badges_displayed % 3]:
+                        st.markdown(f"""
+                        <div class="badge-container locked">
+                            <div class="badge-icon">🔒</div>
+                            <div class="badge-name">{badge_info['name']}</div>
+                            <div class="badge-description">{badge_info['description']}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    badges_displayed += 1

@@ -17,7 +17,7 @@ from utils.layout import get_device_type, responsive_grid, responsive_container,
 from utils.components import (
     zen_header, mission_card, degen_card, progress_bar, stat_card, 
     xp_level_display, zen_button, notification, leaderboard_item, 
-    add_animations_css, data_chart, user_stats_panel, lesson_card
+    add_animations_css, data_chart, user_stats_panel
 )
 
 def calculate_xp_progress(user_data):
@@ -111,41 +111,58 @@ def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
     
     users_data = load_user_data()
     user_data = users_data.get(st.session_state.username, {})
-      # Jeśli nie dostarczono niestandardowych kolumn, użyj jednej kolumny na całą szerokość
+    
+    # Jeśli nie dostarczono niestandardowych kolumn, użyj domyślnych
     if custom_columns is None:
-        # Zawsze używaj jednej kolumny na całą szerokość
-        custom_columns = [st.container()]
+        # Domyślny układ dla różnych urządzeń
+        device = get_device_type()
+        if device == 'mobile':
+            cols_per_row = 1
+        elif device == 'tablet':
+            cols_per_row = 2
+        else:
+            cols_per_row = 3
+        custom_columns = st.columns(cols_per_row)
     
     # Display lessons in the responsive grid
     for i, (lesson_id, lesson) in enumerate(lessons_list.items()):
         # Get lesson properties
         difficulty = lesson.get('difficulty', 'intermediate')
-        is_completed = lesson_id in user_data.get('completed_lessons', [])# Przygotuj symbol trudności
+        is_completed = lesson_id in user_data.get('completed_lessons', [])
+        
+        # Estimate reading time: average adult reads ~250 words per minute
+        # We'll approximate based on content length (simplified)
+        content_length = len(lesson.get('description', '')) + sum(len(section.get('content', '')) 
+                                                                for section in lesson.get('sections', {}).get('learning', {}).get('sections', []))
+        estimated_minutes = max(1, round(content_length / 1000))  # Rough estimate
+          # Przygotuj symbol trudności
         if difficulty == "beginner":
             difficulty_symbol = "🟢"
         elif difficulty == "intermediate":
             difficulty_symbol = "🟠"
         else:
             difficulty_symbol = "🔴"
-          # Użyj zawsze pierwszej kolumny, bo teraz mamy tylko jedną kolumnę
-        with custom_columns[0]:
-            # Użyj komponentu lesson_card dla spójności z widokiem lekcji
-            lesson_card(
-                title=lesson.get('title', 'Lekcja'),
-                description=lesson.get('description', 'Ta lekcja wprowadza podstawowe zasady...'),
-                xp=lesson.get('xp_reward', 30),
-                difficulty=difficulty,
-                category=lesson.get('tag', ''),
-                completed=is_completed,
-                button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
-                button_key=f"{tab_name}_start_{lesson_id}_{i}",
-                lesson_id=lesson_id,
-                on_click=lambda lesson_id=lesson_id: (
-                    setattr(st.session_state, 'current_lesson', lesson_id),
-                    setattr(st.session_state, 'page', 'lesson'),
-                    st.rerun()
-                )
-        )
+        
+        # Użyj responsywnego layoutu
+        col_index = i % len(custom_columns)
+        with custom_columns[col_index]:
+            degen_card(
+                title=lesson['title'],
+                description=lesson['description'][:100] + ('...' if len(lesson['description']) > 100 else ''),
+                badges=[
+                    {'text': f'💎 {lesson["xp_reward"]} XP', 'type': 'xp'},
+                    {'text': f'{difficulty_symbol} {difficulty.capitalize()}', 'type': f'difficulty-{difficulty.lower()}'},
+                    {'text': f'⏱️ {estimated_minutes} min', 'type': 'time'},
+                    {'text': f'{lesson["tag"]}', 'type': 'tag'}
+                ],
+                status='completed' if is_completed else 'incomplete',
+                status_text='✓ Ukończono' if is_completed else '○ Nieukończono'
+            )
+            unique_key = f"{tab_name}_start_{lesson_id}_{i}"
+            if zen_button(f"Rozpocznij", key=unique_key):
+                st.session_state.current_lesson = lesson_id
+                st.session_state.page = 'lesson'
+                st.rerun()
 
 def get_recommended_lessons(username):
     """Get recommended lessons based on user type"""
@@ -199,7 +216,9 @@ def show_dashboard():
     add_animations_css()
 
     users_data = load_user_data()
-    user_data = users_data[st.session_state.username]    # WIERSZ 1: Profil użytkownika i profil inwestycyjny w dwóch kolumnach
+    user_data = users_data[st.session_state.username]
+
+    # WIERSZ 1: Profil użytkownika i profil inwestycyjny w dwóch kolumnach
     st.markdown("<div class='st-bx fadeIn delay-1'>", unsafe_allow_html=True)
     
     # Responsywny układ kolumn, dostosowany do urządzenia
@@ -254,20 +273,22 @@ def show_dashboard():
       # WIERSZ 2: Dostępne lekcje w pełnej szerokości
     st.markdown("<div class='st-bx fadeIn delay-2'>", unsafe_allow_html=True)
     st.subheader("Dostępne lekcje")
-      # Zamiast zakładek, wyświetl wszystkie lekcje bez podziału na kategorie
+    
+    # Zamiast zakładek, wyświetl wszystkie lekcje bez podziału na kategorie
     lessons = load_lessons()
     
-    # Zawsze używamy jednej kolumny na całą szerokość
-    display_lesson_cards(lessons, "all_lessons")
+    # Zastosuj responsywną siatkę dla lekcji, zależnie od urządzenia
+    lesson_cols = responsive_grid(columns_desktop=3, columns_tablet=2, columns_mobile=1)
+    display_lesson_cards(lessons, "all_lessons", custom_columns=lesson_cols)
 
     st.markdown("</div>", unsafe_allow_html=True)
-      # WIERSZ 3: Misje dnia (bez rankingu XP)
+    
+    # WIERSZ 3: Misje dnia (bez rankingu XP)
     st.markdown("<div class='st-bx fadeIn delay-3'>", unsafe_allow_html=True)
     
     # 3. MISJE DNIA (pełna szerokość)
     st.subheader("Misje dnia")
-    
-    # Get daily missions and progress
+      # Get daily missions and progress
     daily_missions = get_daily_missions(st.session_state.username)
     missions_progress = get_daily_missions_progress(st.session_state.username)
     
@@ -402,22 +423,27 @@ def show_dashboard():
             'current': user_data.get('weekly_correct_answers', 0),
             'target': 15,
             'reward': 'Odblokowanie specjalnej lekcji',
-            'expires': '3 dni'
-        }
+            'expires': '3 dni'        }
     ]
-
-    for challenge in weekly_challenges:
+    
+    # Użyj responsywnej siatki dla wyzwań
+    challenge_cols = responsive_grid(columns_desktop=2, columns_tablet=2, columns_mobile=1)
+    
+    for idx, challenge in enumerate(weekly_challenges):
         progress = min(100, int((challenge['current'] / challenge['target']) * 100))
         completed = progress == 100
         
-        mission_card(
-            title=challenge['title'], 
-            description=f"{challenge['description']} (Wygasa za: {challenge['expires']})", 
-            badge_emoji='🏆', 
-            xp=challenge['reward'],
-            progress=progress,
-            completed=completed
-        )
+        # Umieść wyzwanie w odpowiedniej kolumnie responsywnej siatki
+        col_index = idx % len(challenge_cols)
+        with challenge_cols[col_index]:
+            mission_card(
+                title=challenge['title'], 
+                description=f"{challenge['description']} (Wygasa za: {challenge['expires']})", 
+                badge_emoji='🏆', 
+                xp=challenge['reward'],
+                progress=progress,
+                completed=completed
+            )
 
     st.markdown("</div>", unsafe_allow_html=True)
     

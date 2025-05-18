@@ -64,19 +64,34 @@ def show_lesson():
             lessons_by_category[category].append((lesson_id, lesson))
           # Wyświetl lekcje w podziale na kategorie
         for category, category_lessons in lessons_by_category.items():
-            st.markdown(f"## {category}")            # Wyświetlaj każdą kartę lekcji na całą szerokość wiersza
+            st.markdown(f"## {category}")
+            
+            # Zastosuj responsywną siatkę dla lekcji, zależnie od urządzenia
+            lesson_cols = responsive_grid(columns_desktop=3, columns_tablet=2, columns_mobile=1)
+            
+            # Wyświetlaj karty lekcji w responsywnej siatce
             for i, (lesson_id, lesson) in enumerate(category_lessons):
                 # Sprawdź, czy lekcja jest ukończona
                 is_completed = lesson_id in completed_lessons
                 
-                # Użyj komponentu lesson_card zamiast ręcznego HTML
-                lesson_card(
+                # Szacowanie czasu na podstawie długości treści
+                content_length = len(lesson.get('description', '')) + sum(len(section.get('content', '')) 
+                                                        for section in lesson.get('sections', {}).get('learning', {}).get('sections', []))
+                estimated_minutes = max(1, round(content_length / 1000))
+                
+                # Użyj odpowiedniej kolumny z responsywnego gridu
+                col_index = i % len(lesson_cols)
+                with lesson_cols[col_index]:
+                    # Użyj komponentu lesson_card zamiast ręcznego HTML
+                    lesson_card(
                     title=lesson.get('title', 'Lekcja'),
                     description=lesson.get('description', 'Ta lekcja wprowadza podstawowe zasady...'),
                     xp=lesson.get('xp_reward', 30),
+                    duration=estimated_minutes,
                     difficulty=lesson.get('difficulty', 'beginner'),
                     category=lesson.get('tag', category),
-                    completed=is_completed,                    button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
+                    completed=is_completed,
+                    button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
                     button_key=f"start_{lesson_id}",
                     lesson_id=lesson_id,
                     on_click=lambda lesson_id=lesson_id: (
