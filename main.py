@@ -8,7 +8,11 @@ from views.degen_test import show_degen_test
 from views.lesson import show_lesson
 from views.profile import show_profile
 from views.degen_explorer import show_degen_explorer
+<<<<<<< HEAD
 from views.skills_new import show_skill_tree  # Zaktualizowane na nowy interfejs skills
+=======
+from views.skills import show_skill_tree  # Dodaj ten import
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 from config.settings import PAGE_CONFIG
 
 # Configure the page and hide page names in sidebar

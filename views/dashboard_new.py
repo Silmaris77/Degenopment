@@ -12,8 +12,16 @@ from data.lessons import load_lessons
 from utils.goals import get_user_goals, calculate_goal_metrics
 from utils.daily_missions import get_daily_missions_progress
 from views.degen_test import plot_radar_chart
+<<<<<<< HEAD
 from utils.material3_components import apply_material3_theme
 from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view
+=======
+<<<<<<< HEAD
+from utils.material3_components import apply_material3_theme
+from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 from utils.components import (
     zen_header, mission_card, degen_card, progress_bar, stat_card, 
     xp_level_display, zen_button, notification, leaderboard_item, 
@@ -97,13 +105,30 @@ def get_user_xp_history(username, days=30):
     
     return history
 
+<<<<<<< HEAD
 def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
     """Display lesson cards in a responsive layout
+=======
+<<<<<<< HEAD
+def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
+    """Display lesson cards in a responsive layout
+=======
+def display_lesson_cards(lessons_list, tab_name=""):
+    """Display lesson cards in a single column layout
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     Args:
         lessons_list: Dictionary of lessons to display
         tab_name: Name of the tab to use for creating unique button keys
+<<<<<<< HEAD
         custom_columns: Optional pre-defined columns for responsive layout
+=======
+<<<<<<< HEAD
+        custom_columns: Optional pre-defined columns for responsive layout
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     """
     if not lessons_list:
         st.info("Brak dostępnych lekcji w tej kategorii.")
@@ -112,6 +137,10 @@ def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
     users_data = load_user_data()
     user_data = users_data.get(st.session_state.username, {})
     
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Jeśli nie dostarczono niestandardowych kolumn, użyj domyślnych
     if custom_columns is None:
         # Domyślny układ dla różnych urządzeń
@@ -125,6 +154,12 @@ def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
         custom_columns = st.columns(cols_per_row)
     
     # Display lessons in the responsive grid
+<<<<<<< HEAD
+=======
+=======
+    # Display lessons in a single column
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     for i, (lesson_id, lesson) in enumerate(lessons_list.items()):
         # Get lesson properties
         difficulty = lesson.get('difficulty', 'intermediate')
@@ -135,7 +170,16 @@ def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
         content_length = len(lesson.get('description', '')) + sum(len(section.get('content', '')) 
                                                                 for section in lesson.get('sections', {}).get('learning', {}).get('sections', []))
         estimated_minutes = max(1, round(content_length / 1000))  # Rough estimate
+<<<<<<< HEAD
           # Przygotuj symbol trudności
+=======
+<<<<<<< HEAD
+          # Przygotuj symbol trudności
+=======
+        
+        # Przygotuj symbol trudności
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         if difficulty == "beginner":
             difficulty_symbol = "🟢"
         elif difficulty == "intermediate":
@@ -143,6 +187,10 @@ def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
         else:
             difficulty_symbol = "🔴"
         
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         # Użyj responsywnego layoutu
         col_index = i % len(custom_columns)
         with custom_columns[col_index]:
@@ -163,6 +211,28 @@ def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
                 st.session_state.current_lesson = lesson_id
                 st.session_state.page = 'lesson'
                 st.rerun()
+<<<<<<< HEAD
+=======
+=======
+        degen_card(
+            title=lesson['title'],
+            description=lesson['description'][:100] + ('...' if len(lesson['description']) > 100 else ''),
+            badges=[
+                {'text': f'💎 {lesson["xp_reward"]} XP', 'type': 'xp'},
+                {'text': f'{difficulty_symbol} {difficulty.capitalize()}', 'type': f'difficulty-{difficulty.lower()}'},
+                {'text': f'⏱️ {estimated_minutes} min', 'type': 'time'},
+                {'text': f'{lesson["tag"]}', 'type': 'tag'}
+            ],
+            status='completed' if is_completed else 'incomplete',
+            status_text='✓ Ukończono' if is_completed else '○ Nieukończono'
+        )
+        unique_key = f"{tab_name}_start_{lesson_id}_{i}"
+        if zen_button(f"Rozpocznij", key=unique_key):
+            st.session_state.current_lesson = lesson_id
+            st.session_state.page = 'lesson'
+            st.rerun()
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 
 def get_recommended_lessons(username):
     """Get recommended lessons based on user type"""
@@ -199,6 +269,10 @@ def get_daily_missions(username):
     return DAILY_MISSIONS[:3]
 
 def show_dashboard():
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Zastosuj style Material 3
     apply_material3_theme()
     
@@ -209,6 +283,11 @@ def show_dashboard():
     # Pobierz aktualny typ urządzenia
     device_type = get_device_type()
     
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Używamy naszego komponentu nagłówka
     zen_header("Dashboard Degena")
     
@@ -220,6 +299,10 @@ def show_dashboard():
 
     # WIERSZ 1: Profil użytkownika i profil inwestycyjny w dwóch kolumnach
     st.markdown("<div class='st-bx fadeIn delay-1'>", unsafe_allow_html=True)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     # Responsywny układ kolumn, dostosowany do urządzenia
     if device_type == 'mobile':
@@ -228,6 +311,12 @@ def show_dashboard():
         investor_profile_col = profile_cols[0]
     else:
         profile_col, investor_profile_col = st.columns(2)  # Na większych ekranach dwie kolumny
+<<<<<<< HEAD
+=======
+=======
+    profile_col, investor_profile_col = st.columns(2)
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     # 1a. PROFIL UŻYTKOWNIKA (kolumna 1)
     with profile_col:
@@ -270,16 +359,35 @@ def show_dashboard():
             st.info("Twój profil inwestycyjny jest jeszcze niekompletny")
     
     st.markdown("</div>", unsafe_allow_html=True)
+<<<<<<< HEAD
       # WIERSZ 2: Dostępne lekcje w pełnej szerokości
+=======
+<<<<<<< HEAD
+      # WIERSZ 2: Dostępne lekcje w pełnej szerokości
+=======
+    
+    # WIERSZ 2: Dostępne lekcje w pełnej szerokości
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     st.markdown("<div class='st-bx fadeIn delay-2'>", unsafe_allow_html=True)
     st.subheader("Dostępne lekcje")
     
     # Zamiast zakładek, wyświetl wszystkie lekcje bez podziału na kategorie
     lessons = load_lessons()
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     # Zastosuj responsywną siatkę dla lekcji, zależnie od urządzenia
     lesson_cols = responsive_grid(columns_desktop=3, columns_tablet=2, columns_mobile=1)
     display_lesson_cards(lessons, "all_lessons", custom_columns=lesson_cols)
+<<<<<<< HEAD
+=======
+=======
+    display_lesson_cards(lessons, "all_lessons")
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 
     st.markdown("</div>", unsafe_allow_html=True)
     
@@ -288,7 +396,16 @@ def show_dashboard():
     
     # 3. MISJE DNIA (pełna szerokość)
     st.subheader("Misje dnia")
+<<<<<<< HEAD
       # Get daily missions and progress
+=======
+<<<<<<< HEAD
+      # Get daily missions and progress
+=======
+    
+    # Get daily missions and progress
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     daily_missions = get_daily_missions(st.session_state.username)
     missions_progress = get_daily_missions_progress(st.session_state.username)
     
@@ -314,6 +431,10 @@ def show_dashboard():
     )
     
     if daily_missions:
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         # Użyj responsywnej siatki dla misji
         mission_cols = responsive_grid(columns_desktop=3, columns_tablet=2, columns_mobile=1)
         
@@ -343,6 +464,35 @@ def show_dashboard():
                             # Create a success message
                             notification(f"Misja '{mission['title']}' została ukończona! +{mission['xp']} XP", type="success")
                             st.rerun()
+<<<<<<< HEAD
+=======
+=======
+        for mission in daily_missions:
+            # Check if mission is completed
+            is_completed = mission['title'] in missions_progress['completed_ids']
+            
+            # Używamy komponentu mission_card
+            mission_card(
+                title=mission['title'], 
+                description=mission['description'], 
+                badge_emoji=mission['badge'], 
+                xp=mission['xp'],
+                progress=100 if is_completed else 0,
+                completed=is_completed
+            )
+            
+            # Complete button (only if not completed)
+            if not is_completed:
+                if zen_button("Ukończ misję", key=f"complete_{mission['title'].replace(' ', '_')}"):
+                    from utils.daily_missions import complete_daily_mission
+                    complete_success = complete_daily_mission(st.session_state.username, mission['title'])
+                    
+                    if complete_success:
+                        # Create a success message
+                        notification(f"Misja '{mission['title']}' została ukończona! +{mission['xp']} XP", type="success")
+                        st.rerun()
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
             
         if zen_button("Odśwież misje", key="refresh_missions"):
             st.rerun()
@@ -423,8 +573,21 @@ def show_dashboard():
             'current': user_data.get('weekly_correct_answers', 0),
             'target': 15,
             'reward': 'Odblokowanie specjalnej lekcji',
+<<<<<<< HEAD
             'expires': '3 dni'        }
     ]
+=======
+            'expires': '3 dni'
+<<<<<<< HEAD
+        }    ]
+    
+    # Użyj responsywnej siatki dla wyzwań
+    challenge_cols = responsive_grid(columns_desktop=2, columns_tablet=2, columns_mobile=1)
+    
+    for idx, challenge in enumerate(weekly_challenges):
+        progress = min(100, int((challenge['current'] / challenge['target']) * 100))
+        completed = progress == 100
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     # Użyj responsywnej siatki dla wyzwań
     challenge_cols = responsive_grid(columns_desktop=2, columns_tablet=2, columns_mobile=1)
@@ -444,6 +607,26 @@ def show_dashboard():
                 progress=progress,
                 completed=completed
             )
+<<<<<<< HEAD
+=======
+=======
+        }
+    ]
+
+    for challenge in weekly_challenges:
+        progress = min(100, int((challenge['current'] / challenge['target']) * 100))
+        completed = progress == 100
+        
+        mission_card(
+            title=challenge['title'], 
+            description=f"{challenge['description']} (Wygasa za: {challenge['expires']})", 
+            badge_emoji='🏆', 
+            xp=challenge['reward'],
+            progress=progress,
+            completed=completed
+        )
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 
     st.markdown("</div>", unsafe_allow_html=True)
     

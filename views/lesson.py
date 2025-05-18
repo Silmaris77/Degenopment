@@ -2,8 +2,16 @@ import streamlit as st
 from data.lessons import load_lessons
 from data.users import load_user_data, save_user_data
 from utils.components import zen_header, zen_button, notification, content_section, tip_block, quote_block, progress_bar, embed_content, lesson_card
+<<<<<<< HEAD
 from utils.material3_components import apply_material3_theme
 from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view
+=======
+<<<<<<< HEAD
+from utils.material3_components import apply_material3_theme
+from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 
 def get_difficulty_stars(difficulty):
     """Konwertuje poziom trudności (liczba lub tekst) na odpowiednią liczbę gwiazdek."""
@@ -32,6 +40,10 @@ def get_difficulty_stars(difficulty):
 def show_lesson():
     """Show lesson view"""
     
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Zastosuj style Material 3
     apply_material3_theme()
     
@@ -42,6 +54,11 @@ def show_lesson():
     # Pobierz aktualny typ urządzenia
     device_type = get_device_type()
     
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     zen_header("Kurs Zen Degen Academy")
     lessons = load_lessons()
     
@@ -62,6 +79,10 @@ def show_lesson():
             if category not in lessons_by_category:
                 lessons_by_category[category] = []
             lessons_by_category[category].append((lesson_id, lesson))
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
           # Wyświetl lekcje w podziale na kategorie
         for category, category_lessons in lessons_by_category.items():
             st.markdown(f"## {category}")            # Wyświetlaj każdą kartę lekcji na całą szerokość wiersza
@@ -70,13 +91,37 @@ def show_lesson():
                 is_completed = lesson_id in completed_lessons
                 
                 # Użyj komponentu lesson_card zamiast ręcznego HTML
+<<<<<<< HEAD
+=======
+=======
+        
+        # Wyświetl lekcje w podziale na kategorie
+        for category, category_lessons in lessons_by_category.items():
+            st.markdown(f"## {category}")
+            
+            # Wyświetlaj karty lekcji w jednej kolumnie zamiast w siatce
+            for i, (lesson_id, lesson) in enumerate(category_lessons):
+                # Sprawdź, czy lekcja jest ukończona
+                is_completed = lesson_id in completed_lessons
+                  # Użyj komponentu lesson_card zamiast ręcznego HTML
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                 lesson_card(
                     title=lesson.get('title', 'Lekcja'),
                     description=lesson.get('description', 'Ta lekcja wprowadza podstawowe zasady...'),
                     xp=lesson.get('xp_reward', 30),
                     difficulty=lesson.get('difficulty', 'beginner'),
                     category=lesson.get('tag', category),
+<<<<<<< HEAD
                     completed=is_completed,                    button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
+=======
+<<<<<<< HEAD
+                    completed=is_completed,                    button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
+=======
+                    completed=is_completed,
+                    button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                     button_key=f"start_{lesson_id}",
                     lesson_id=lesson_id,
                     on_click=lambda lesson_id=lesson_id: (

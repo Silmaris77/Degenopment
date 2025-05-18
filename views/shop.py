@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 import streamlit as st
 from data.users import load_user_data, save_user_data
 from utils.components import zen_button, notification, zen_header, add_animations_css
@@ -57,10 +61,26 @@ def show_shop():
     </style>
     """, unsafe_allow_html=True)
     
+<<<<<<< HEAD
+=======
+=======
+def show_shop():
+    st.title("Sklep 🛒")
+    
+    # Pobierz dane użytkownika
+    users_data = load_user_data()
+    user_data = users_data.get(st.session_state.username, {})
+    
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Wirtualna waluta użytkownika
     degen_coins = user_data.get('degen_coins', 0)
     st.markdown(f"<div class='coin-display'>🪙 <span class='coin-amount'>{degen_coins}</span> DegenCoins</div>", unsafe_allow_html=True)
     
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Dodaj style dla zakładek w sklepie
     st.markdown("""
     <style>
@@ -83,6 +103,13 @@ def show_shop():
     # Kategorie produktów z responsywnym kontenerem
     with st.container():
         categories = st.tabs(["Awatary", "Tła", "Specjalne lekcje", "Boostery"])
+<<<<<<< HEAD
+=======
+=======
+    # Kategorie produktów
+    categories = st.tabs(["Awatary", "Tła", "Specjalne lekcje", "Boostery"])
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     with categories[0]:
         # Awatary dostępne w sklepie
@@ -92,6 +119,10 @@ def show_shop():
             {"id": "moon_hunter", "name": "Moon Hunter", "icon": "🌕", "price": 1000, "owned": "moon_hunter" in user_data.get('owned_avatars', [])}
         ]
         
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         # Wyświetl awatary w responsywnej siatce
         cols = responsive_grid(columns_desktop=3, columns_tablet=2, columns_mobile=1)
         
@@ -197,6 +228,15 @@ def show_shop():
         
         for i, avatar in enumerate(avatars):
             with cols[i % len(cols)]:
+<<<<<<< HEAD
+=======
+=======
+        # Wyświetl awatary w siatce
+        cols = st.columns(3)
+        for i, avatar in enumerate(avatars):
+            with cols[i % 3]:
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                 if avatar["owned"]:
                     st.markdown(f"""
                     <div class="shop-item owned">
@@ -214,6 +254,10 @@ def show_shop():
                         <div class="shop-item-price">🪙 {avatar['price']}</div>
                         <button class="shop-buy-btn">Kup</button>
                     </div>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                     """, unsafe_allow_html=True)
     
     with categories[1]:
@@ -584,4 +628,11 @@ def show_shop():
     # Funkcja obsługi zakupów (placeholder)
     if st.session_state.get('purchase_made'):
         st.success("Zakup został zrealizowany pomyślnie!")
+<<<<<<< HEAD
         st.session_state.purchase_made = False
+=======
+        st.session_state.purchase_made = False
+=======
+                    """, unsafe_allow_html=True)
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
+>>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
