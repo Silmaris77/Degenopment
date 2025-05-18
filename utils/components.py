@@ -769,13 +769,19 @@ def lesson_card(title, description, image=None, xp=0, duration=0, difficulty=Non
                button_key=None, lesson_id=None, category=None):
     """
     Renders a standardized lesson card for both dashboard and lessons view
+<<<<<<< HEAD
     with Material 3 design principles
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
     """
     # Prepare difficulty info
     if difficulty is None:
         difficulty = "beginner"
     
+<<<<<<< HEAD
     # Material 3 Colors
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
     difficulty_colors = {
         "beginner": "#4CAF50",
         "intermediate": "#FF9800",
@@ -792,6 +798,7 @@ def lesson_card(title, description, image=None, xp=0, duration=0, difficulty=Non
     
     difficulty_color = difficulty_colors.get(difficulty.lower(), "#4CAF50")
     difficulty_icon = difficulty_icons.get(difficulty.lower(), "🟢")
+<<<<<<< HEAD
     
     # Generate the HTML for the card with Material 3 design
     card_html = f"""
@@ -881,6 +888,59 @@ def lesson_card(title, description, image=None, xp=0, duration=0, difficulty=Non
         align-items: center;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+=======
+      # Generate the HTML for the card with properly formatted CSS
+    card_html = f"""
+    <div class="lesson-card">
+        <h3>{title}</h3>
+        <div class="lesson-badges">
+            <span class="xp-badge">
+                💎 {xp} XP
+            </span>
+            <span class="difficulty-badge" style="background-color: {difficulty_color};">
+                {difficulty_icon} {difficulty.capitalize()}
+            </span>
+            {f'<span class="category-badge">{category}</span>' if category else ''}
+        </div>
+        <p>{description[:150]}{'...' if len(description) > 150 else ''}</p>
+        <p class="completion-status {'completed' if completed else ''}">
+            {'✓ Ukończono' if completed else '○ Nieukończono'}
+        </p>
+    </div>
+    """
+    
+    # Define CSS styles separately
+    styles = """
+    <style>
+    .lesson-card {
+        background-color: white;
+        color: #333;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 5px solid #2196F3;
+    }
+    .lesson-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 10px 0;
+    }
+    .xp-badge {
+        background-color: #FFD700;
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .difficulty-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: white;
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
     }
     .time-badge {
         background-color: #2196F3;
@@ -929,6 +989,7 @@ def lesson_card(title, description, image=None, xp=0, duration=0, difficulty=Non
             if 'quiz_score' in st.session_state:
                 st.session_state.quiz_score = 0
             st.rerun()
+<<<<<<< HEAD
 
 def skill_node(name, icon, level, max_level, description="", unlocked=True, cost=0, on_click=None, node_id=None):
     """
@@ -976,3 +1037,5 @@ def skill_node(name, icon, level, max_level, description="", unlocked=True, cost
     
     # Zwróć klucz węzła, który może być używany do śledzenia kliknięć
     return node_key
+=======
+>>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
