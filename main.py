@@ -8,6 +8,7 @@ from views.degen_test import show_degen_test
 from views.lesson import show_lesson
 from views.profile import show_profile
 from views.degen_explorer import show_degen_explorer
+from views.skills import show_skill_tree  # Dodaj ten import
 from config.settings import PAGE_CONFIG
 
 # Configure the page and hide page names in sidebar
@@ -40,22 +41,15 @@ def main():
         with st.sidebar:
             st.markdown(f"### Witaj, {st.session_state.username}!")
             
-            # Definicja elementów menu nawigacyjnego
-            nav_items = [
-                {'name': 'Dashboard', 'page': 'dashboard', 'icon': '🏠'},
-                {'name': 'Test typu Degena', 'page': 'degen_test', 'icon': '🧪'},
-                {'name': 'Odkrywanie Typów Degenów', 'page': 'degen_explorer', 'icon': '🔍'},
-                {'name': 'Mój Profil', 'page': 'profile', 'icon': '👤'},
-            ]
+            # Nawigacja
+            navigation_menu()
             
-            # Wyświetlenie menu nawigacyjnego za pomocą komponentu
-            navigation_menu(nav_items, current_page=st.session_state.page)
-            
-            # Przycisk wylogowania
-            if st.button("Wyloguj", use_container_width=True):
+            # Przycisk wylogowania na dole sidebara
+            if st.button("Wyloguj się", key="logout_button"):
                 clear_session()
                 st.rerun()
-      # Page routing
+    
+    # Page routing
     if not st.session_state.logged_in:
         show_login_page()
     else:
@@ -69,6 +63,8 @@ def main():
             show_profile()
         elif st.session_state.page == 'degen_explorer':
             show_degen_explorer()
+        elif st.session_state.page == 'skills':  # Dodaj tę sekcję
+            show_skill_tree()
 
 st.markdown("<style>div.stButton > button { margin-bottom: 1px; }</style>", unsafe_allow_html=True)
 if __name__ == "__main__":

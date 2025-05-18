@@ -247,27 +247,44 @@ def zen_header(title, subtitle=None):
     if subtitle:
         st.markdown(f"<p class='zen-subtitle'>{subtitle}</p>", unsafe_allow_html=True)
 
-def navigation_menu(items, current_page=None):
-    """
-    Tworzy menu nawigacyjne.
+def navigation_menu():
+    """Wyświetla menu nawigacyjne aplikacji"""
     
-    Parametry:
-    - items: Lista słowników z kluczami 'name', 'page', 'icon'
-    - current_page: Obecnie aktywna strona
-    """
-    for item in items:
-        icon = item.get('icon', '')
-        label = f"{icon} {item['name']}"
-        disabled = current_page == item['page']
+    menu_options = [
+        {"id": "dashboard", "name": "Dashboard", "icon": "🏠"},
+        {"id": "degen_test", "name": "Test degena", "icon": "🧪"},
+        {"id": "lesson", "name": "Lekcje", "icon": "📚"},
+        {"id": "skills", "name": "Umiejętności", "icon": "🌳"},  # Dodaj tę linię
+        {"id": "degen_explorer", "name": "Eksplorator", "icon": "🔍"},
+        {"id": "profile", "name": "Profil", "icon": "👤"}
+    ]
+    
+    for option in menu_options:
+        # Dodaj stylizację dla aktywnego przycisku bez parametru active
+        button_label = f"{option['icon']} {option['name']}"
         
-        if zen_button(label, key=f"nav_{item['page']}", 
-                    disabled=disabled, use_container_width=True):
-            st.session_state.page = item['page']
+        # Użyj zen_button bez parametru active
+        if zen_button(
+            button_label, 
+            key=f"nav_{option['id']}"
+        ):
+            st.session_state.page = option['id']
             st.rerun()
+        
+        # Opcjonalnie, możesz dodać stylizację dla aktywnego przycisku używając CSS
+        if st.session_state.page == option['id']:
+            st.markdown(f"""
+            <style>
+            div[data-testid="stButton"] button[kind="secondary"][data-testid="baseButton-secondary"][aria-label="{button_label}"] {{
+                background-color: rgba(255, 255, 255, 0.1);
+                border-left: 3px solid #4CAF50;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
 
 # Komponenty statystyk i danych
 
-def stat_card(label, value, icon=None, change=None, change_type=None):
+def stat_card(label, value, icon=None, change=None, change_type=None, custom_class=None):
     """
     Tworzy kartę statystyki.
     
@@ -277,6 +294,7 @@ def stat_card(label, value, icon=None, change=None, change_type=None):
     - icon: Emoji ikony
     - change: Zmiana wartości (z podanym znakiem)
     - change_type: Typ zmiany (positive, negative, neutral)
+    - custom_class: Niestandardowa klasa CSS dla karty
     """
     change_html = ""
     if change:
@@ -284,19 +302,30 @@ def stat_card(label, value, icon=None, change=None, change_type=None):
             "#e74c3c" if change_type == "negative" else "#7f8c8d")
         change_html = f'<span style="color: {change_color}; font-size: 12px;">({change})</span>'
     
-    icon_html = f'<span style="font-size: 24px; margin-right: 10px;">{icon}</span>' if icon else ""
-    
-    stat_html = f"""
-    <div style="background-color: white; border-radius: 10px; padding: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
-        <div style="display: flex; align-items: center;">
-            {icon_html}
-            <div>
-                <div style="color: #7f8c8d; font-size: 14px;">{label}</div>
-                <div style="font-size: 24px; font-weight: bold; color: #2c3e50;">{value} {change_html}</div>
+    # Używamy nowej struktury HTML, jeśli przekazano custom_class
+    if custom_class:
+        stat_html = f"""
+        <div class="{custom_class}">
+            <div class="stat-icon">{icon}</div>
+            <div class="stat-value">{value} {change_html}</div>
+            <div class="stat-label">{label}</div>
+        </div>
+        """
+    else:
+        # Oryginalna wersja dla wstecznej kompatybilności
+        icon_html = f'<span style="font-size: 24px; margin-right: 10px;">{icon}</span>' if icon else ""
+        
+        stat_html = f"""
+        <div style="background-color: white; border-radius: 10px; padding: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+            <div style="display: flex; align-items: center;">
+                {icon_html}
+                <div>
+                    <div style="color: #7f8c8d; font-size: 14px;">{label}</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #2c3e50;">{value} {change_html}</div>
+                </div>
             </div>
         </div>
-    </div>
-    """
+        """
     
     st.markdown(stat_html, unsafe_allow_html=True)
 
@@ -341,24 +370,104 @@ def xp_level_display(xp, level, next_level_xp):
     progress_percent = min(100, int((xp_progress / xp_needed) * 100)) if xp_needed > 0 else 0
     
     level_html = f"""
-    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-        <div style="background-color: #2980B9; color: white; width: 50px; height: 50px; border-radius: 50%; 
-                  display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;
-                  margin-right: 15px;">{level}</div>
-        <div style="flex-grow: 1;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                <span style="font-weight: bold;">Poziom {level}</span>
-                <span>XP: {xp} / {next_level_xp}</span>
+    <div class="m3-level-progress">
+        <div class="level-info">
+            <div class="current-level">
+                <div class="level-number">{level}</div>
+                <div class="level-label">Poziom</div>
             </div>
-            <div class="mission-progress-container">
-                <div class="mission-progress-bar" style="width: {progress_percent}%"></div>
-            </div>
-            <div style="text-align: right; font-size: 12px; margin-top: 5px;">
-                {xp_needed - xp_progress} XP do poziomu {level + 1}
+            <div class="progress-container">
+                <div class="xp-info">
+                    <span>XP: {xp} / {next_level_xp}</span>
+                    <span>{xp_needed - xp_progress} XP do poziomu {level + 1}</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {progress_percent}%"></div>
+                </div>
+                <div class="level-markers">
+                    <div class="level-start">{level}</div>
+                    <div class="level-end">{level + 1}</div>
+                </div>
             </div>
         </div>
     </div>
     """
+    
+    # Dodajemy style CSS dla nowego wyglądu poziomu
+    st.markdown("""
+    <style>
+    .m3-level-progress {
+        margin: 15px 0;
+    }
+    
+    .level-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .current-level {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 15px;
+        min-width: 60px;
+    }
+    
+    .level-number {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        margin-bottom: 5px;
+    }
+    
+    .level-label {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    .progress-container {
+        flex-grow: 1;
+    }
+    
+    .xp-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+        color: #555;
+    }
+    
+    .progress-bar-container {
+        height: 10px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(to right, #667eea, #764ba2);
+        border-radius: 5px;
+        transition: width 0.5s ease;
+    }
+    
+    .level-markers {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #777;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     st.markdown(level_html, unsafe_allow_html=True)
 
@@ -654,3 +763,216 @@ def user_stats_panel(username, avatar, degen_type, level, xp, completed_lessons=
     # Pasek postępu XP do następnego poziomu
     if next_level_xp is not None:
         xp_level_display(xp=xp, level=level, next_level_xp=next_level_xp)
+
+def lesson_card(title, description, image=None, xp=0, duration=0, difficulty=None, 
+               completed=False, button_text="Rozpocznij", on_click=None, 
+               button_key=None, lesson_id=None, category=None):
+    """
+    Renders a standardized lesson card for both dashboard and lessons view
+    with Material 3 design principles
+    """
+    # Prepare difficulty info
+    if difficulty is None:
+        difficulty = "beginner"
+    
+    # Material 3 Colors
+    difficulty_colors = {
+        "beginner": "#4CAF50",
+        "intermediate": "#FF9800",
+        "advanced": "#F44336",
+        "expert": "#9C27B0"
+    }
+    
+    difficulty_icons = {
+        "beginner": "🟢",
+        "intermediate": "🟠",
+        "advanced": "🔴",
+        "expert": "⭐"
+    }
+    
+    difficulty_color = difficulty_colors.get(difficulty.lower(), "#4CAF50")
+    difficulty_icon = difficulty_icons.get(difficulty.lower(), "🟢")
+    
+    # Generate the HTML for the card with Material 3 design
+    card_html = f"""
+    <div class="m3-lesson-card {'m3-lesson-card-completed' if completed else ''}">
+        <div class="m3-card-content">
+            <h3>{title}</h3>
+            <div class="m3-lesson-badges">
+                <span class="m3-badge m3-badge-xp">
+                    💎 {xp} XP
+                </span>
+                <span class="m3-badge" style="background-color: {difficulty_color};">
+                    {difficulty_icon} {difficulty.capitalize()}
+                </span>
+                {f'<span class="m3-badge m3-badge-category">{category}</span>' if category else ''}
+            </div>
+            <p class="m3-description">{description[:150]}{'...' if len(description) > 150 else ''}</p>
+            <p class="m3-completion-status {'m3-completed' if completed else ''}">
+                {'✓ Ukończono' if completed else '○ Nieukończono'}
+            </p>
+        </div>
+    </div>
+    """
+    
+    # Define Material 3 CSS styles
+    styles = """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    
+    .m3-lesson-card {
+        background-color: white;
+        color: #333;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Roboto', sans-serif;
+    }
+    
+    .m3-lesson-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #2196F3, #673AB7);
+        opacity: 0.8;
+    }
+    
+    .m3-lesson-card:hover {
+        box-shadow: 0 8px 16px rgba(0,0,0,0.16);
+        transform: translateY(-2px);
+    }
+    
+    .m3-lesson-card-completed::before {
+        background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    }
+    
+    .m3-card-content {
+        position: relative;
+    }
+    
+    .m3-lesson-card h3 {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: #1A237E;
+    }
+    
+    .m3-lesson-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 16px 0;
+    }
+    
+    .m3-badge {
+        padding: 6px 12px;
+        border-radius: 24px;
+        font-size: 14px;
+        font-weight: 500;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    }
+    .time-badge {
+        background-color: #2196F3;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+    .category-badge {
+        background-color: #9575CD;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: inline-block;
+        margin-top: 5px;
+    }
+    .completion-status {
+        color: #757575;
+        margin-top: 10px;
+    }
+    .completion-status.completed {
+        color: #4CAF50;
+    }
+    </style>
+    """
+    
+    # Render the card with styles
+    st.markdown(card_html + styles, unsafe_allow_html=True)
+    
+    # Add the button with custom behavior
+    if button_key is None and lesson_id is not None:
+        button_key = f"lesson_btn_{lesson_id}"
+    
+    if zen_button(button_text, key=button_key, use_container_width=True):
+        if on_click and callable(on_click):
+            # If there's a callback function, call it with lesson_id
+            if lesson_id:
+                on_click(lesson_id)
+            else:
+                on_click()
+        else:
+            # Default behavior - set current lesson and redirect
+            st.session_state.current_lesson = lesson_id
+            st.session_state.lesson_step = 'intro'
+            if 'quiz_score' in st.session_state:
+                st.session_state.quiz_score = 0
+            st.rerun()
+
+def skill_node(name, icon, level, max_level, description="", unlocked=True, cost=0, on_click=None, node_id=None):
+    """
+    Wyświetla węzeł umiejętności w drzewie umiejętności.
+    
+    Parametry:
+    - name: Nazwa umiejętności
+    - icon: Emoji lub ikona umiejętności
+    - level: Aktualny poziom umiejętności
+    - max_level: Maksymalny poziom umiejętności
+    - description: Opis umiejętności (opcjonalny)
+    - unlocked: Czy umiejętność jest odblokowana (domyślnie True)
+    - cost: Koszt ulepszenia w XP (opcjonalny)
+    - on_click: Funkcja wywoływana po kliknięciu w węzeł (opcjonalny)
+    - node_id: Identyfikator węzła (opcjonalny)
+    """
+    node_key = f"skill_node_{hash(name)}_{random.randint(1000, 9999)}" if node_id is None else f"skill_node_{node_id}"
+    
+    # Klasa CSS zależna od stanu odblokowania
+    lock_class = "unlocked" if unlocked else "locked"
+    
+    # Pasek postępu
+    progress_percent = (level / max_level) * 100 if max_level > 0 else 0
+    
+    html = f"""
+    <div class="skill-node {lock_class}" id="{node_key}">
+        <div class="skill-icon">{icon}</div>
+        <h4>{name}</h4>
+        <div class="skill-level">Poziom: {level}/{max_level}</div>
+        <div class="skill-progress-container">
+            <div class="skill-progress-bar" style="width: {progress_percent}%;"></div>
+        </div>
+        <p>{description}</p>
+    """
+    
+    if not unlocked:
+        html += f'<div class="skill-cost">Koszt odblokowania: {cost} XP</div>'
+    elif level < max_level:
+        html += f'<div class="skill-cost">Koszt ulepszenia: {cost} XP</div>'
+    
+    html += "</div>"
+    
+    # Wyświetl węzeł
+    st.markdown(html, unsafe_allow_html=True)
+    
+    # Zwróć klucz węzła, który może być używany do śledzenia kliknięć
+    return node_key

@@ -55,3 +55,12 @@ def update_user_xp(username, xp_amount):
         save_user_data(users_data)
         return True
     return False
+
+def update_single_user_field(username, field_name, field_value):
+    """Update a single field in a user's data"""
+    users_data = load_user_data()
+    if username in users_data:
+        users_data[username][field_name] = field_value
+        save_user_data(users_data)
+        return True
+    return False
