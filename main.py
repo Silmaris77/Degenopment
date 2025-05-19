@@ -8,11 +8,7 @@ from views.degen_test import show_degen_test
 from views.lesson import show_lesson
 from views.profile import show_profile
 from views.degen_explorer import show_degen_explorer
-<<<<<<< HEAD
 from views.skills_new import show_skill_tree  # Zaktualizowane na nowy interfejs skills
-=======
-from views.skills import show_skill_tree  # Dodaj ten import
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 from config.settings import PAGE_CONFIG
 
 # Configure the page and hide page names in sidebar
@@ -70,6 +66,39 @@ def main():
         elif st.session_state.page == 'skills':  # Dodaj tę sekcję
             show_skill_tree()
 
-st.markdown("<style>div.stButton > button { margin-bottom: 1px; }</style>", unsafe_allow_html=True)
+st.markdown("""
+<style>
+div.stButton > button { 
+    margin-bottom: 1px; 
+}
+
+/* Poprawa widoczności tekstu w przyciskach przy różnych stanach */
+div.stButton > button:hover {
+    color: #000000 !important; /* Czarny tekst dla lepszego kontrastu */
+    font-weight: bold;
+}
+
+/* Przyciski z niebieskim tłem */
+section[data-testid="stSidebar"] div.stButton > button:hover,
+div.stButton > button[kind="primary"]:hover {
+    color: black !important; /* Biały tekst na niebieskim tle */
+    text-shadow: 0 0 2px rgba(0,0,0,0.5); /* Cień tekstu dla lepszej widoczności */
+    font-weight: bold;
+}
+
+/* Przyciski w aplikacji - "POKAŻ LEK", "ANALITYKA" itp. */
+button[kind="secondary"] {
+    color: black !important;
+    text-shadow: 0 0 2px rgba(0,0,0,0.5); 
+    font-weight: bold !important;
+}
+
+button[kind="secondary"]:hover {
+    color: white !important;
+    background-color: var(--primary-color) !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 if __name__ == "__main__":
     main()

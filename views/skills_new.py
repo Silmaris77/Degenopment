@@ -422,8 +422,8 @@ def show_progress_dashboard(user_skills, user_xp, user_completed_lessons, catego
             x=alt.X('Blok:N', sort=None),
             y=alt.Y('Postęp (%):Q', scale=alt.Scale(domain=[0, 100])),
             color=alt.Color('Blok:N', scale=alt.Scale(scheme='category10')),
-            tooltip=['Blok', 'Postęp (%)']
-        ).properties(
+            tooltip=['Blok', 'Postęp (%)'
+        ]).properties(
             width='container',
             height=200
         ).configure_axis(
@@ -486,7 +486,7 @@ def display_block_with_skills(block_id, block, categories, user_skills, user_xp,
     elif device_type == 'tablet':
         num_cols = 2
     else:
-        num_cols = 3
+        num_cols = 1
     
     # Utwórz siatkę dla kart umiejętności
     cols = st.columns(num_cols)
@@ -532,10 +532,6 @@ def display_skill_card(category, user_completed_lessons, user_skills, users_data
         <div class="context-menu-item" onclick="showLessons('{category['id']}')">
             <span class="context-menu-item-icon">📚</span>
             <span>Pokaż lekcje</span>
-        </div>
-        <div class="context-menu-item" onclick="markAsComplete('{category['id']}')">
-            <span class="context-menu-item-icon">✅</span>
-            <span>Oznacz wszystkie lekcje jako ukończone</span>
         </div>
         <div class="context-menu-divider"></div>
         <div class="context-menu-item" onclick="hideMenu()">
@@ -590,20 +586,14 @@ def display_skill_card(category, user_completed_lessons, user_skills, users_data
         // Znajdź i kliknij odpowiedni przycisk
         document.querySelector(`button[key="btn_show_lessons_${{categoryId}}"]`).click();
     }}
-    
-    function markAsComplete(categoryId) {{
-        // Stworzyć żądanie do backendu przez customowy event
-        const event = new CustomEvent('markAllComplete', {{
-            detail: {{ categoryId: categoryId }}
-        }});
-        document.dispatchEvent(event);
-    }}
     </script>
-    """, unsafe_allow_html=True)      # Przyciski akcji
-    col1, col2, col3 = st.columns(3)
+    """, unsafe_allow_html=True)
+    
+    # Przyciski akcji - ZMODYFIKOWANE, BEZ "UKOŃCZ WSZYSTKIE"
+    col1, col2 = st.columns(2)  # Zmienione z 3 na 2 kolumny
     
     with col1:
-        # Przycisk do pokazania lekcji - używamy innego klucza dla przycisku i stanu sesji
+        # Przycisk do pokazania lekcji
         if st.button(f"Pokaż lekcje", key=f"btn_show_lessons_{category['id']}"):
             lessons_state_key = f"show_lessons_{category['id']}"
             st.session_state[lessons_state_key] = not st.session_state.get(lessons_state_key, False)
@@ -613,7 +603,7 @@ def display_skill_card(category, user_completed_lessons, user_skills, users_data
                 st.session_state[analytics_state_key] = False
     
     with col2:
-        # Przycisk do pokazania analityki - używamy innego klucza dla przycisku i stanu sesji
+        # Przycisk do pokazania analityki
         if st.button(f"Analityka", key=f"btn_show_analytics_{category['id']}"):
             analytics_state_key = f"show_analytics_{category['id']}"
             st.session_state[analytics_state_key] = not st.session_state.get(analytics_state_key, False)
@@ -622,13 +612,9 @@ def display_skill_card(category, user_completed_lessons, user_skills, users_data
             if st.session_state.get(lessons_state_key, False):
                 st.session_state[lessons_state_key] = False
     
-    with col3:
-        # Szybka akcja - oznacz wszystkie jako ukończone
-        if lessons_completed_count < 10:
-            if st.button(f"Ukończ wszystkie", key=f"complete_all_{category['id']}"):
-                updated_lessons = mark_all_lessons_as_completed(category, users_data, user_data)
-                st.rerun()
-      # Wyświetl lekcje jeśli przycisk został naciśnięty
+    # Usunięto przycisk "Ukończ wszystkie" i trzecią kolumnę
+    
+    # Wyświetl lekcje jeśli przycisk został naciśnięty
     lessons_state_key = f"show_lessons_{category['id']}"
     if st.session_state.get(lessons_state_key, False):
         display_category_lessons(category, calculated_level, user_completed_lessons)
@@ -640,10 +626,21 @@ def display_skill_card(category, user_completed_lessons, user_skills, users_data
 
 
 def display_category_lessons(category, current_level, completed_lessons):
-    """Wyświetla lekcje dla danej kategorii w ulepszonym stylu"""
+    """Wyświetla lekcje dla danej kategorii z oznaczeniem dostępności"""
     
     # Pobierz aktualny typ urządzenia
     device_type = get_device_type()
+    
+    # Pobierz listę dostępnych lekcji
+    available_lessons_data = get_available_lessons()
+    
+    # Utwórz listę ID dostępnych lekcji dla łatwiejszego porównywania
+    available_lessons_ids = []
+    for lesson in available_lessons_data:
+        if isinstance(lesson, dict):
+            available_lessons_ids.append(lesson['id'])
+        else:
+            available_lessons_ids.append(lesson)
     
     st.markdown("<div class='lessons-container'>", unsafe_allow_html=True)
     
@@ -657,6 +654,7 @@ def display_category_lessons(category, current_level, completed_lessons):
     for i, lesson in enumerate(category['lessons']):
         lesson_id = lesson['id']
         lesson_completed = lesson_id in completed_lessons
+        lesson_available = lesson_id in available_lessons_ids
         
         # Generuj unikalny klucz dla przycisku
         button_key = f"lesson_{lesson_id}_{random.randint(1000,9999)}"
@@ -664,34 +662,52 @@ def display_category_lessons(category, current_level, completed_lessons):
         # Dostosuj wygląd lekcji w zależności od urządzenia
         if device_type == 'mobile':
             # Na telefonach używamy prostszego układu
-            lesson_status = "✅" if lesson_completed else "⬜"
+            lesson_status_icon = ""
+            if lesson_completed:
+                lesson_status_icon = "✅"
+            elif not lesson_available:
+                lesson_status_icon = "🔒"
+            else:
+                lesson_status_icon = "⬜"
+                
+            lesson_status_class = "completed" if lesson_completed else ("unavailable" if not lesson_available else "available")
+            
             st.markdown(f"""
-            <div class="lesson-item {('completed' if lesson_completed else 'available')}" tabindex="0" role="button" aria-label="Lekcja {i+1}: {lesson['title']}, {('ukończona' if lesson_completed else 'nieukończona')}">
+            <div class="lesson-item {lesson_status_class}" tabindex="0" role="button" 
+                 aria-label="Lekcja {i+1}: {lesson['title']}, 
+                 {('ukończona' if lesson_completed else ('niedostępna' if not lesson_available else 'dostępna'))}">
                 <span class="lesson-title">{lesson['title']}</span>
-                <span class="lesson-status">{lesson_status}</span>
+                <span class="lesson-status">{lesson_status_icon}</span>
             </div>
             """, unsafe_allow_html=True)
             
-            # Przycisk do rozpoczęcia lekcji
-            if not lesson_completed:
-                if st.button("Rozpocznij lekcję", key=f"start_{button_key}"):
+            # Bezpośredni przycisk do rozpoczęcia lekcji tylko dla dostępnych lekcji
+            if not lesson_completed and lesson_available:
+                if st.button("▶️", key=f"start_{button_key}", help="Rozpocznij lekcję"):
                     st.session_state.current_lesson = lesson_id
+                    st.session_state.current_lesson_category = category['id']
                     st.session_state.page = 'lesson'
                     st.rerun()
+            elif not lesson_available:
+                st.button("🔒", key=f"locked_{button_key}", help="Lekcja niedostępna", disabled=True)
         else:
             # Na tabletach i desktopach używamy bardziej rozbudowanego układu
             col1, col2 = st.columns([5,1])
             
             with col1:
-                lesson_status = "completed" if lesson_completed else "available"
+                lesson_status_class = "completed" if lesson_completed else ("unavailable" if not lesson_available else "available")
+                
                 st.markdown(f"""
-                <div class="lesson-item {lesson_status}" tabindex="0" role="button" aria-label="Lekcja {i+1}: {lesson['title']}, {('ukończona' if lesson_completed else 'nieukończona')}">
+                <div class="lesson-item {lesson_status_class}" tabindex="0" role="button" 
+                     aria-label="Lekcja {i+1}: {lesson['title']}, 
+                     {('ukończona' if lesson_completed else ('niedostępna' if not lesson_available else 'dostępna'))}">
                     <span class="lesson-title">{lesson['title']}</span>
+                    {'' if lesson_available else '<span class="lesson-locked-icon">🔒</span>'}
                 </div>
                 """, unsafe_allow_html=True)
             
             with col2:
-                # Przycisk do oznaczania lekcji jako ukończonej lub nieukończonej
+                # Przycisk do oznaczania lekcji jako ukończonej lub rozpoczęcia lekcji
                 if lesson_completed:
                     if st.button("✅", key=f"mark_{button_key}", help="Oznacz jako nieukończoną"):
                         # Usuń lekcję z ukończonych
@@ -703,11 +719,16 @@ def display_category_lessons(category, current_level, completed_lessons):
                         users_data[st.session_state.username] = user_data
                         save_user_data(users_data)
                         st.rerun()
-                elif st.button("▶️", key=f"mark_{button_key}", help="Rozpocznij lekcję"):
-                    # Przejdź do lekcji
-                    st.session_state.current_lesson = lesson_id
-                    st.session_state.page = 'lesson'
-                    st.rerun()
+                elif lesson_available:
+                    if st.button("▶️", key=f"mark_{button_key}", help="Rozpocznij lekcję"):
+                        # Przejdź do lekcji
+                        st.session_state.current_lesson = lesson_id
+                        st.session_state.current_lesson_category = category['id']
+                        st.session_state.page = 'lesson'
+                        st.rerun()
+                else:
+                    # Lekcja niedostępna - wyświetl zablokowany przycisk
+                    st.button("🔒", key=f"locked_{button_key}", help="Lekcja niedostępna", disabled=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -938,6 +959,18 @@ def add_custom_css():
     
     .lesson-item.available {
         border-left: 3px solid #3498db;
+    }
+    
+    .lesson-item.unavailable {
+        border-left: 3px solid #bbb;
+        opacity: 0.7;
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+    }
+    
+    .lesson-item.unavailable:hover {
+        transform: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     
     .lesson-title {
@@ -1507,3 +1540,86 @@ def show_skill_analytics(category, user_completed_lessons):
     """, unsafe_allow_html=True)
     
     return
+
+def get_available_lessons():
+    """Odczytuje dostępne lekcje z plików i przyporządkowuje je do odpowiednich bloków i kategorii"""
+    import os
+    import json
+    
+    # Ścieżka do folderu z lekcjami
+    lessons_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "lessons")
+    
+    # Sprawdź, czy folder istnieje
+    if not os.path.exists(lessons_dir):
+        st.warning(f"Folder lekcji nie istnieje: {lessons_dir}")
+        return []
+    
+    # Lista dostępnych lekcji
+    available_lessons = []
+    
+    # Przeszukaj folder lessons
+    for file_name in os.listdir(lessons_dir):
+        # Każdy plik z .json to lekcja
+        if file_name.endswith('.json'):
+            try:
+                # Pełna ścieżka do pliku
+                file_path = os.path.join(lessons_dir, file_name)
+                
+                # Odczytaj zawartość pliku JSON
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    lesson_data = json.load(file)
+                
+                # Pobierz ID lekcji z pliku
+                lesson_id = lesson_data.get('id', '')
+                
+                # Sprawdź, czy ID jest zgodne z formatem "BxCyLz" (np. B1C1L1)
+                if lesson_id and lesson_id.startswith('B') and 'C' in lesson_id and 'L' in lesson_id:
+                    # Wyodrębnij numery bloku, kategorii i lekcji z ID
+                    block_num, rest = lesson_id.split('B')[1].split('C')
+                    category_num, lesson_num = rest.split('L')
+                    
+                    # Konwersja na liczby całkowite
+                    try:
+                        block_num = int(block_num)
+                        category_num = int(category_num)
+                        lesson_num = int(lesson_num)
+                        
+                        # Dodaj informacje do listy dostępnych lekcji
+                        available_lessons.append({
+                            'id': lesson_id,
+                            'title': lesson_data.get('title', 'Brak tytułu'),
+                            'block': block_num,
+                            'category': category_num,
+                            'lesson_number': lesson_num,
+                            'difficulty': lesson_data.get('difficulty', 'beginner'),
+                            'file_path': file_path
+                        })
+                    except ValueError:
+                        # Jeśli nie można przekonwertować na liczby całkowite, dodaj samą nazwę pliku
+                        available_lessons.append(lesson_id)
+                else:
+                    # Jeśli ID nie pasuje do formatu, po prostu dodaj nazwę pliku bez rozszerzenia
+                    lesson_id = os.path.splitext(file_name)[0]
+                    available_lessons.append(lesson_id)
+                    
+            except (json.JSONDecodeError, IOError) as e:
+                st.error(f"Błąd odczytu pliku {file_name}: {e}")
+                # Dodaj samą nazwę pliku w przypadku błędu
+                lesson_id = os.path.splitext(file_name)[0]
+                available_lessons.append(lesson_id)
+        
+        # Obsługa plików Markdown, które mogą nie mieć struktury JSON
+        elif file_name.endswith('.md'):
+            lesson_id = os.path.splitext(file_name)[0]
+            available_lessons.append(lesson_id)
+    
+    # Opcjonalnie - wyświetl debug info
+    if st.session_state.get('dev_mode', False) and st.sidebar.checkbox("Debug lekcji", False):
+        st.sidebar.write("Znalezione lekcje:")
+        for lesson in available_lessons:
+            if isinstance(lesson, dict):
+                st.sidebar.write(f"- {lesson['id']}: Blok {lesson['block']}, Kategoria {lesson['category']}, Numer {lesson['lesson_number']}")
+            else:
+                st.sidebar.write(f"- {lesson} (tylko ID)")
+    
+    return available_lessons

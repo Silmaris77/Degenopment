@@ -97,18 +97,8 @@ def get_user_xp_history(username, days=30):
     
     return history
 
-<<<<<<< HEAD
 def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
     """Display lesson cards in a responsive layout
-=======
-<<<<<<< HEAD
-def display_lesson_cards(lessons_list, tab_name="", custom_columns=None):
-    """Display lesson cards in a responsive layout
-=======
-def display_lesson_cards(lessons_list, tab_name=""):
-    """Display lesson cards in a single column layout
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     
     Args:
         lessons_list: Dictionary of lessons to display
@@ -126,38 +116,17 @@ def display_lesson_cards(lessons_list, tab_name=""):
         # Zawsze używaj jednej kolumny na całą szerokość
         custom_columns = [st.container()]
     
-<<<<<<< HEAD
     # Display lessons in the responsive grid
     for i, (lesson_id, lesson) in enumerate(lessons_list.items()):
         # Get lesson properties
         difficulty = lesson.get('difficulty', 'intermediate')
         is_completed = lesson_id in user_data.get('completed_lessons', [])# Przygotuj symbol trudności
-=======
-<<<<<<< HEAD
-    # Display lessons in the responsive grid
-    for i, (lesson_id, lesson) in enumerate(lessons_list.items()):
-        # Get lesson properties
-        difficulty = lesson.get('difficulty', 'intermediate')
-        is_completed = lesson_id in user_data.get('completed_lessons', [])# Przygotuj symbol trudności
-=======
-    # Display lessons in a single column
-    for i, (lesson_id, lesson) in enumerate(lessons_list.items()):
-        # Get lesson properties
-        difficulty = lesson.get('difficulty', 'intermediate')
-        is_completed = lesson_id in user_data.get('completed_lessons', [])
-          # Przygotuj symbol trudności
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         if difficulty == "beginner":
             difficulty_symbol = "🟢"
         elif difficulty == "intermediate":
             difficulty_symbol = "🟠"
         else:
             difficulty_symbol = "🔴"
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
           # Użyj zawsze pierwszej kolumny, bo teraz mamy tylko jedną kolumnę
         with custom_columns[0]:
             # Użyj komponentu lesson_card dla spójności z widokiem lekcji
@@ -176,27 +145,6 @@ def display_lesson_cards(lessons_list, tab_name=""):
                     setattr(st.session_state, 'page', 'lesson'),
                     st.rerun()
                 )
-<<<<<<< HEAD
-=======
-=======
-          # Użyj komponentu lesson_card dla spójności z widokiem lekcji
-        lesson_card(
-            title=lesson.get('title', 'Lekcja'),
-            description=lesson.get('description', 'Ta lekcja wprowadza podstawowe zasady...'),
-            xp=lesson.get('xp_reward', 30),
-            difficulty=difficulty,
-            category=lesson.get('tag', ''),
-            completed=is_completed,
-            button_text="Powtórz lekcję" if is_completed else "Rozpocznij",
-            button_key=f"{tab_name}_start_{lesson_id}_{i}",
-            lesson_id=lesson_id,
-            on_click=lambda lesson_id=lesson_id: (
-                setattr(st.session_state, 'current_lesson', lesson_id),
-                setattr(st.session_state, 'page', 'lesson'),
-                st.rerun()
-            )
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         )
 
 def get_recommended_lessons(username):
@@ -306,7 +254,6 @@ def show_dashboard():
       # WIERSZ 2: Dostępne lekcje w pełnej szerokości
     st.markdown("<div class='st-bx fadeIn delay-2'>", unsafe_allow_html=True)
     st.subheader("Dostępne lekcje")
-<<<<<<< HEAD
       # Zamiast zakładek, wyświetl wszystkie lekcje bez podziału na kategorie
     lessons = load_lessons()
     
@@ -314,90 +261,6 @@ def show_dashboard():
     display_lesson_cards(lessons, "all_lessons")
 
     st.markdown("</div>", unsafe_allow_html=True)
-      # WIERSZ 3: Misje dnia (bez rankingu XP)
-=======
-<<<<<<< HEAD
-      # Zamiast zakładek, wyświetl wszystkie lekcje bez podziału na kategorie
-    lessons = load_lessons()
-=======
-    
-    # Zamiast zakładek, wyświetl wszystkie lekcje bez podziału na kategorie
-    lessons = load_lessons()
-    display_lesson_cards(lessons, "all_lessons")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # WIERSZ 3: Misje dnia (bez rankingu XP)
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
-    st.markdown("<div class='st-bx fadeIn delay-3'>", unsafe_allow_html=True)
-    
-    # 3. MISJE DNIA (pełna szerokość)
-    st.subheader("Misje dnia")
-    
-    # Get daily missions and progress
-    daily_missions = get_daily_missions(st.session_state.username)
-    missions_progress = get_daily_missions_progress(st.session_state.username)
-    
-    # Overall progress indicator
-    progress_percentage = missions_progress['progress']
-    
-    # Add streak indicator
-    streak = missions_progress['streak']
-    streak_html = ""
-    if streak > 0:
-        streak_html = f"""
-        <div class="streak-container">
-            <div class="streak-badge">🔥 {streak} dni</div>
-            <div class="streak-label">Twoja seria</div>
-        </div>
-        """
-    
-    # Show overall progress
-    progress_bar(
-        value=missions_progress['completed'],
-        max_value=missions_progress['total'],
-        label=f"Ukończono: {missions_progress['completed']}/{missions_progress['total']} ({int(progress_percentage)}%)"
-    )
-    
-    if daily_missions:
-<<<<<<< HEAD
-=======
-        for mission in daily_missions:
-            # Check if mission is completed
-            is_completed = mission['title'] in missions_progress['completed_ids']
-            
-            # Używamy komponentu mission_card
-            mission_card(
-                title=mission['title'], 
-                description=mission['description'], 
-                badge_emoji=mission['badge'], 
-                xp=mission['xp'],
-                progress=100 if is_completed else 0,
-                completed=is_completed
-            )
-            
-            # Complete button (only if not completed)
-            if not is_completed:
-                if zen_button("Ukończ misję", key=f"complete_{mission['title'].replace(' ', '_')}"):
-                    from utils.daily_missions import complete_daily_mission
-                    complete_success = complete_daily_mission(st.session_state.username, mission['title'])
-                    
-                    if complete_success:
-                        # Create a success message
-                        notification(f"Misja '{mission['title']}' została ukończona! +{mission['xp']} XP", type="success")
-                        st.rerun()
-            
-        if zen_button("Odśwież misje", key="refresh_missions"):
-            st.rerun()
-    else:
-        st.info("Nie masz dostępnych misji na dziś.")
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
-    
-    # Zawsze używamy jednej kolumny na całą szerokość
-    display_lesson_cards(lessons, "all_lessons")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-<<<<<<< HEAD
       # WIERSZ 3: Misje dnia (bez rankingu XP)
     st.markdown("<div class='st-bx fadeIn delay-3'>", unsafe_allow_html=True)
     
@@ -430,22 +293,15 @@ def show_dashboard():
     )
     
     if daily_missions:
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         # Użyj responsywnej siatki dla misji
         mission_cols = responsive_grid(columns_desktop=3, columns_tablet=2, columns_mobile=1)
         
         for idx, mission in enumerate(daily_missions):
             # Check if mission is completed
             is_completed = mission['title'] in missions_progress['completed_ids']
-<<<<<<< HEAD
               # Umieść misję w odpowiedniej kolumnie responsywnej siatki
             col_index = idx % len(mission_cols)
             with mission_cols[col_index]:
-=======
-            
-            # Umieść misję w odpowiedniej kolumnie responsywnej siatki
-            col_index = idx % len(mission_cols)            with mission_cols[col_index]:
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                 # Używamy komponentu mission_card
                 mission_card(
                     title=mission['title'], 
@@ -497,35 +353,6 @@ def show_dashboard():
         else:
             st.info("Brak danych o historii XP. Zacznij swój pierwszy kurs!")
     
-<<<<<<< HEAD
-=======
-=======
-    
-    # WIERSZ 4: Wykres postępu i Ranking XP w dwóch kolumnach
-    st.markdown("<div class='st-bx fadeIn delay-4'>", unsafe_allow_html=True)
-    progress_col, leaderboard_col = st.columns(2)
-    
-    # 4a. WYKRES POSTĘPU
-    with progress_col:
-        st.subheader("Twój postęp")
-        
-        # Wykres trendu XP przy użyciu komponentu data_chart
-        history = get_user_xp_history(st.session_state.username)
-        if history:
-            chart_data = pd.DataFrame(history)
-            data_chart(
-                data=chart_data,
-                chart_type="area",
-                title="Rozwój XP w czasie",
-                x_label="Data",
-                y_label="Punkty XP",
-                height=300
-            )
-        else:
-            st.info("Brak danych o historii XP. Zacznij swój pierwszy kurs!")
-    
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # 4b. RANKING XP (przeniesiony z wiersza 3)
     with leaderboard_col:
         st.subheader("Ranking XP")

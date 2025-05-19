@@ -377,6 +377,26 @@
   overflow: hidden !important;
 }
 
+/* Style dla przycisków przy różnych stanach - poprawa widoczności tekstu */
+.stButton > button:hover {
+  color: #000000 !important; /* Czarny tekst */
+  font-weight: bold !important;
+}
+
+/* Przyciski w sidebarze - niebieskie tło */
+[data-testid="stSidebar"] .stButton > button:hover {
+  color: #FFFFFF !important; /* Biały tekst na niebieskim tle */
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5) !important; /* Cień tekstu dla lepszej widoczności */
+  font-weight: bold !important;
+}
+
+/* Przyciski z niebieskim tłem - kontrastowy tekst */
+.stButton > button[type="primary"]:hover {
+  color: #FFFFFF !important;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5) !important;
+  font-weight: bold !important;
+}
+
 .css-1a1fmpi, .css-15tx938 {
   font-family: var(--md-font-family-display) !important;
 }

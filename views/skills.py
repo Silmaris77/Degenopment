@@ -1,8 +1,4 @@
 import streamlit as st
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 from utils.components import zen_header, zen_button, notification, skill_node
 from utils.material3_components import apply_material3_theme
 from utils.layout import get_device_type, responsive_grid, responsive_container, toggle_device_view
@@ -19,15 +15,6 @@ def show_skill_tree():
     # Pobierz aktualny typ urządzenia
     device_type = get_device_type()
     
-<<<<<<< HEAD
-=======
-=======
-from data.users import load_user_data, save_user_data
-from utils.components import zen_button, notification
-
-def show_skill_tree():
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     st.title("Drzewko umiejętności inwestycyjnych 🌳")
     
     # Pobierz dane użytkownika
@@ -256,16 +243,7 @@ def show_skill_tree():
     
     # Usuwamy informację o dostępnych punktach XP, gdyż nie jest już potrzebna
     # st.info(f"Dostępne punkty XP: {user_xp}")
-<<<<<<< HEAD
       # Dodaj krótką informację o mechanice
-=======
-<<<<<<< HEAD
-      # Dodaj krótką informację o mechanice
-=======
-    
-    # Dodaj krótką informację o mechanice
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     st.markdown("""
         <div class="info-box">
             <h4>📋 Jak zdobywać poziomy umiejętności?</h4>
@@ -274,10 +252,6 @@ def show_skill_tree():
         </div>
     """, unsafe_allow_html=True)
     
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Dodaj responsywne style dla info-box
     st.markdown("""
     <style>
@@ -315,20 +289,11 @@ def show_skill_tree():
     </style>
     """, unsafe_allow_html=True)
     
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Wyświetl wszystkie bloki i ich kategorie
     for block_id, block in blocks.items():
         st.markdown(f"## {block['name']}")
         st.markdown(f"*{block['description']}*")
         
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         # Dodaj responsywne style dla nagłówków bloków
         st.markdown("""
         <style>
@@ -361,11 +326,6 @@ def show_skill_tree():
         </style>
         """, unsafe_allow_html=True)
         
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
         # Kontener na blok kategorii
         with st.container():
             st.markdown('<div class="block-container">', unsafe_allow_html=True)
@@ -518,10 +478,6 @@ def display_categories_in_block(block_id, categories, user_skills, user_xp, user
     
     block_categories = [cat_id for cat_id, cat in categories.items() if cat['block'] == block_id]
     
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     # Pobierz aktualny typ urządzenia
     device_type = get_device_type()
     
@@ -610,54 +566,6 @@ def display_categories_in_block(block_id, categories, user_skills, user_xp, user
                     # Wyświetlenie lekcji dla tej kategorii
                     if st.checkbox(f"Pokaż lekcje dla {category['name']}", key=f"show_lessons_{category['id']}"):
                         display_category_lessons(category, calculated_level, user_completed_lessons)
-<<<<<<< HEAD
-=======
-=======
-    # Podziel kategorie na wiersze po 2 w każdym
-    for i in range(0, len(block_categories), 2):
-        row_categories = block_categories[i:i+2]
-        cols = st.columns(len(row_categories))
-        
-        for j, cat_id in enumerate(row_categories):
-            category = categories[cat_id]
-            with cols[j]:
-                # Oblicz poziom na podstawie ukończonych lekcji
-                category_lessons_ids = [lesson["id"] for lesson in category['lessons']]
-                completed_category_lessons = [lesson_id for lesson_id in user_completed_lessons if lesson_id in category_lessons_ids]
-                lessons_completed_count = len(completed_category_lessons)
-                
-                # Poziom = liczba ukończonych lekcji (max 10)
-                calculated_level = min(lessons_completed_count, 10)
-                
-                # Aktualizuj poziom w danych użytkownika jeśli się zmienił
-                if calculated_level != category['level']:
-                    if category['id'] not in user_skills:
-                        user_skills[category['id']] = {'level': 0}
-                    
-                    user_skills[category['id']]['level'] = calculated_level
-                    user_data['skills'] = user_skills
-                    users_data[st.session_state.username] = user_data
-                    save_user_data(users_data)
-                
-                # Wszystkie kategorie są teraz zawsze odblokowane, więc usuwamy warunek
-                progress = int((calculated_level / category['max_level']) * 100)
-                st.markdown(f"""
-                <div class="skill-node unlocked">
-                    <h4>{category['icon']} {category['name']}</h4>
-                    <div class="level-indicator">Poziom {calculated_level}/{category['max_level']}</div>
-                    <div class="skill-progress-bar">
-                        <div class="skill-progress" style="width: {progress}%;"></div>
-                    </div>
-                    <p>{category['description']}</p>
-                    <p class="completed-lessons">Ukończone lekcje: {lessons_completed_count}/10</p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Wyświetlenie lekcji dla tej kategorii
-                if st.checkbox(f"Pokaż lekcje dla {category['name']}", key=f"show_lessons_{category['id']}"):
-                    display_category_lessons(category, calculated_level, user_completed_lessons)
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                         
                 # else:
                 #     st.markdown(f"""
@@ -672,60 +580,27 @@ def display_categories_in_block(block_id, categories, user_skills, user_xp, user
 def display_category_lessons(category, current_level, completed_lessons):
     """Wyświetla lekcje dla danej kategorii"""
     
-<<<<<<< HEAD
     # Pobierz aktualny typ urządzenia
     device_type = get_device_type()
     
-=======
-<<<<<<< HEAD
-    # Pobierz aktualny typ urządzenia
-    device_type = get_device_type()
-    
-=======
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
     for i, lesson in enumerate(category['lessons']):
         lesson_id = lesson['id']
         lesson_completed = lesson_id in completed_lessons
         
-<<<<<<< HEAD
         # Dostosuj wygląd lekcji w zależności od urządzenia
         if device_type == 'mobile':
             # Na telefonach używamy innego układu
-=======
-<<<<<<< HEAD
-        # Dostosuj wygląd lekcji w zależności od urządzenia
-        if device_type == 'mobile':
-            # Na telefonach używamy innego układu
-=======
-        # Wszystkie lekcje są teraz dostępne
-        col1, col2 = st.columns([5,1])
-        
-        with col1:
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
             if lesson_completed:
                 st.markdown(f"""
                 <div class="lesson-item completed">
                     <span>{lesson['title']}</span>
-<<<<<<< HEAD
                     <span class="lesson-status">✅</span>
-=======
-<<<<<<< HEAD
-                    <span class="lesson-status">✅</span>
-=======
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
                 <div class="lesson-item available">
                     <span>{lesson['title']}</span>
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
                     <span class="lesson-status">⬜</span>
                 </div>
                 """, unsafe_allow_html=True)
@@ -774,38 +649,6 @@ def display_category_lessons(category, current_level, completed_lessons):
                         users_data[st.session_state.username] = user_data
                         save_user_data(users_data)
                         st.rerun()
-<<<<<<< HEAD
-=======
-=======
-                </div>
-                """, unsafe_allow_html=True)
-        
-        with col2:
-            # Przycisk do oznaczania lekcji jako ukończonej lub nieukończonej
-            if lesson_completed:
-                if st.button("✅", key=f"mark_{lesson_id}", help="Oznacz jako nieukończoną"):
-                    # Usuń lekcję z ukończonych
-                    users_data = load_user_data()
-                    user_data = users_data.get(st.session_state.username, {})
-                    user_completed = set(user_data.get("completed_lessons", []))
-                    user_completed.discard(lesson_id)
-                    user_data["completed_lessons"] = list(user_completed)
-                    users_data[st.session_state.username] = user_data
-                    save_user_data(users_data)
-                    st.rerun()
-            else:
-                if st.button("⬜", key=f"mark_{lesson_id}", help="Oznacz jako ukończoną"):
-                    # Dodaj lekcję do ukończonych
-                    users_data = load_user_data()
-                    user_data = users_data.get(st.session_state.username, {})
-                    user_completed = set(user_data.get("completed_lessons", []))
-                    user_completed.add(lesson_id)
-                    user_data["completed_lessons"] = list(user_completed)
-                    users_data[st.session_state.username] = user_data
-                    save_user_data(users_data)
-                    st.rerun()
->>>>>>> dda51e1c93ae49ab44d2b243a50f7020f999a724
->>>>>>> a526237cc52a37f7735f8688de6dce465045e2d2
 
 
 # Usuwamy lub komentujemy tę funkcję, gdyż nie jest już potrzebna
